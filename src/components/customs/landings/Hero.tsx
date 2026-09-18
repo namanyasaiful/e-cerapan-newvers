@@ -2,8 +2,11 @@
 
 import { Button } from '@heroui/react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default function Hero() {
+  const router = useRouter();
+
   return (
     <section id="home" className="relative overflow-hidden">
       {/* Background image */}
@@ -17,9 +20,7 @@ export default function Hero() {
         />
       </div>
 
-
       <div className='absolute inset-0 z-0 w-full bg-linear-to-b from-blue-500/90 via-blue-400/80 to-transparent' />
-
 
       <div className="relative z-10 mx-auto flex max-w-content flex-col items-center px-6 py-20 text-center text-white md:py-28">
         <h1 className="text-3xl font-bold leading-tight md:text-5xl">
@@ -35,8 +36,9 @@ export default function Hero() {
         </p>
         <Button
           variant='primary'
+          onPress={() => router.push('/e-cerapan')}
           className='h-12 w-full rounded-md mt-4 bg-primary shadow-md px-8 text-base font-semibold text-white sm:w-auto'
-          >
+        >
           Coba Sekarang
         </Button>
       </div>
