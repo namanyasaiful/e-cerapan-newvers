@@ -7,6 +7,14 @@ import autoTable from "jspdf-autotable";
 
 import PageHeader from "@/components/e-cerapan/layout/PageHeader";
 import Stepper from "@/components/e-cerapan/layout/Stepper";
+import PageHeader from "@/components/e-cerapan/ui/PageHeader";
+import ResultCard from "@/components/e-cerapan/ui/ResultCard";
+import MetricSummary from "@/components/e-cerapan/ui/MetricSummary";
+import InfoCard from "@/components/e-cerapan/ui/InfoCard";
+import ParameterTable from "@/components/e-cerapan/ui/ParameterTable";
+import ConfirmationModal from "@/components/e-cerapan/ui/ConfirmationModal";
+import { WizardStepProps } from "@/types/wizard";
+import StatCard from "@/components/e-cerapan/cards/StatCard";
 import ResultCard from "@/components/e-cerapan/cards/ResultCard";
 import MetricSummary from "@/components/e-cerapan/cards/MetricSummary";
 import InfoCard from "@/components/e-cerapan/cards/InfoCard";
@@ -476,6 +484,7 @@ export default function HasilPengujianPage({
 
   return (
     <div className="min-h-screen bg-[#F9F9F9] w-full">
+      
       <div className="px-8 py-8 md:px-12 md:py-12 max-w-[1100px] mx-auto">
         <Stepper
           steps={["Pemeriksaan Awal", "Pengujian/Pemeriksaan", "Hasil"]}
