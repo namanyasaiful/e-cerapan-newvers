@@ -7,12 +7,21 @@ import autoTable from "jspdf-autotable";
 
 import Breadcrumb from "@/components/e-cerapan/layout/Breadcrumb";
 import Stepper from "@/components/e-cerapan/layout/Stepper";
+<<<<<<< HEAD
 import PageHeader from "@/components/e-cerapan/ui/PageHeader";
 import ResultCard from "@/components/e-cerapan/cards/ResultCard";
 import MetricSummary from "@/components/e-cerapan/cards/MetricSummary";
 import InfoCard from "@/components/e-cerapan/cards/InfoCard";
 import ParameterTable from "@/components/e-cerapan/table/ParameterTable";
 import ConfirmationModal from "@/components/e-cerapan/modal/ConfirmationModal";
+=======
+import PageHeader from "@/components/e-cerapan/layout/PageHeader";
+import ResultCard from "@/components/e-cerapan/ui/ResultCard";
+import MetricSummary from "@/components/e-cerapan/ui/MetricSummary";
+import InfoCard from "@/components/e-cerapan/ui/InfoCard";
+import ParameterTable from "@/components/e-cerapan/ui/ParameterTable";
+import ConfirmationModal from "@/components/e-cerapan/ui/ConfirmationModal";
+>>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
 import { WizardStepProps } from "@/types/wizard";
 import StatCard from "@/components/e-cerapan/cards/StatCard";
 
@@ -26,7 +35,10 @@ export default function HasilPengujianPage({
 
   useEffect(() => {
     window.scrollTo(0, 0);
+<<<<<<< HEAD
     window.scrollTo(0, 0);
+=======
+>>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
     if (!updateFormData) {
       router.replace("/e-cerapan");
     }
@@ -329,11 +341,14 @@ export default function HasilPengujianPage({
               reader.onerror = () => resolve(null);
               reader.readAsDataURL(blob);
             })
+<<<<<<< HEAD
               const reader = new FileReader();
               reader.onloadend = () => resolve(reader.result as string);
               reader.onerror = () => resolve(null);
               reader.readAsDataURL(blob);
             })
+=======
+>>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
             : null,
         )
         .catch(() => null);
@@ -535,7 +550,10 @@ export default function HasilPengujianPage({
           <PageHeader
             title="Hasil Keseluruhan Pengujian"
             description="Evaluasi lengkap semua parameter pengujian Pompa Ukur BBM"
+<<<<<<< HEAD
             description="Evaluasi lengkap semua parameter pengujian Pompa Ukur BBM"
+=======
+>>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
           />
 
           <ResultCard isSuccess={displayIsSuccess} />
