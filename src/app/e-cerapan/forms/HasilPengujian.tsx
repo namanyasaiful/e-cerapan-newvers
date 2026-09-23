@@ -1,49 +1,29 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-import Breadcrumb from "@/components/e-cerapan/layout/Breadcrumb";
-import Stepper from "@/components/e-cerapan/layout/Stepper";
-<<<<<<< HEAD
-import PageHeader from "@/components/e-cerapan/ui/PageHeader";
-import ResultCard from "@/components/e-cerapan/cards/ResultCard";
-import MetricSummary from "@/components/e-cerapan/cards/MetricSummary";
-import InfoCard from "@/components/e-cerapan/cards/InfoCard";
-import ParameterTable from "@/components/e-cerapan/table/ParameterTable";
-import ConfirmationModal from "@/components/e-cerapan/modal/ConfirmationModal";
-=======
 import PageHeader from "@/components/e-cerapan/layout/PageHeader";
-import ResultCard from "@/components/e-cerapan/ui/ResultCard";
-import MetricSummary from "@/components/e-cerapan/ui/MetricSummary";
-import InfoCard from "@/components/e-cerapan/ui/InfoCard";
-import ParameterTable from "@/components/e-cerapan/ui/ParameterTable";
-import ConfirmationModal from "@/components/e-cerapan/ui/ConfirmationModal";
->>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
+import Stepper from "@/components/e-cerapan/layout/Stepper";
 import ResultCard from "@/components/e-cerapan/cards/ResultCard";
 import MetricSummary from "@/components/e-cerapan/cards/MetricSummary";
 import InfoCard from "@/components/e-cerapan/cards/InfoCard";
 import ParameterTable from "@/components/e-cerapan/table/ParameterTable";
 import ConfirmationModal from "@/components/e-cerapan/modal/ConfirmationModal";
-import { WizardStepProps } from "@/types/wizard";
-import StatCard from "@/components/e-cerapan/cards/StatCard";
+import type { WizardStepProps } from "@/types/wizard";
 
 export default function HasilPengujianPage({
   formData,
   updateFormData,
-  nextStep,
   prevStep,
 }: Partial<WizardStepProps> = {}) {
   const router = useRouter();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-<<<<<<< HEAD
-    window.scrollTo(0, 0);
-=======
->>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
+
     if (!updateFormData) {
       router.replace("/e-cerapan");
     }
@@ -52,24 +32,25 @@ export default function HasilPengujianPage({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const getImageDataURL = (src: string): Promise<string | null> => {
-    return new Promise((resolve) => {
+  const getImageDataURL = (src: string): Promise<string | null> =>
+    new Promise((resolve) => {
       const img = new Image();
       img.crossOrigin = "Anonymous";
       img.onload = () => {
         const canvas = document.createElement("canvas");
         canvas.width = img.width;
         canvas.height = img.height;
-        const ctx = canvas.getContext("2d");
-        ctx?.drawImage(img, 0, 0);
+        const context = canvas.getContext("2d");
+        context?.drawImage(img, 0, 0);
         resolve(canvas.toDataURL("image/png"));
       };
       img.onerror = () => resolve(null);
       img.src = src;
     });
-  };
+
   const handleConfirmSimpan = async () => {
     setIsLoading(true);
+
     try {
       const pdf = new jsPDF({
         orientation: "portrait",
@@ -86,7 +67,6 @@ export default function HasilPengujianPage({
       const nomorSurat = dataForm?.noSPBU || "P.5617/PKTN.4.5/DL/07/2025";
       const nomorDokumenAtas = "DL-P-25-0095-001";
 
-      // halaman 1
       const logoData = await getImageDataURL("/assets/logo/Metrologi.svg");
 
       if (logoData && logoData.startsWith("data:image")) {
@@ -161,10 +141,7 @@ export default function HasilPengujianPage({
         "Merek/Tipe",
         `${identitasAlat?.[0]?.value || "Aweco"} / ${identitasAlat?.[1]?.value || "AWC 40000L"}`,
       );
-      addKeyValue(
-        "Nomor Seri",
-        identitasAlat?.[2]?.value || "20.10.01 B.254/06",
-      );
+      addKeyValue("Nomor Seri", identitasAlat?.[2]?.value || "20.10.01 B.254/06");
       addKeyValue("Media Uji/Komoditas", "Air");
       addKeyValue(
         "Kapasitas Maksimum",
@@ -215,7 +192,6 @@ export default function HasilPengujianPage({
       });
       pdf.addPage();
 
-      // halaman 2
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(8);
       pdf.text(`Lampiran ${nomorSurat}`, pageWidth - margin, 15, {
@@ -236,26 +212,10 @@ export default function HasilPengujianPage({
 
       const tableHead: import("jspdf-autotable").RowInput[] = [
         [
-          {
-            content: "NO",
-            rowSpan: 2,
-            styles: { halign: "center", valign: "middle" },
-          },
-          {
-            content: "PEMERIKSAAN & PENGUJIAN",
-            rowSpan: 2,
-            styles: { halign: "center", valign: "middle" },
-          },
-          {
-            content: "PEMENUHAN SYARAT",
-            colSpan: 3,
-            styles: { halign: "center" },
-          },
-          {
-            content: "KETERANGAN",
-            rowSpan: 2,
-            styles: { halign: "center", valign: "middle" },
-          },
+          { content: "NO", rowSpan: 2, styles: { halign: "center", valign: "middle" } },
+          { content: "PEMERIKSAAN & PENGUJIAN", rowSpan: 2, styles: { halign: "center", valign: "middle" } },
+          { content: "PEMENUHAN SYARAT", colSpan: 3, styles: { halign: "center" } },
+          { content: "KETERANGAN", rowSpan: 2, styles: { halign: "center", valign: "middle" } },
         ],
         [
           { content: "YA", styles: { halign: "center" } },
@@ -269,22 +229,8 @@ export default function HasilPengujianPage({
         ["II", "Uji Unjuk Kerja (Performance Tests)", "", "", "", ""],
         ["", "2.1 Pengujian Volume Nominal", "X", "", "", ""],
         ["", "2.2 Pengujian Ruang Kosong", "X", "", "", ""],
-        [
-          "",
-          "2.3 Pengujian Kepekaan di Sekitar Volume Nominal",
-          "X",
-          "",
-          "",
-          "",
-        ],
-        [
-          "",
-          "2.4 Pengujian Perubahan Volume Akibat Deformasi",
-          "",
-          "",
-          "X",
-          "",
-        ],
+        ["", "2.3 Pengujian Kepekaan di Sekitar Volume Nominal", "X", "", "", ""],
+        ["", "2.4 Pengujian Perubahan Volume Akibat Deformasi", "", "", "X", ""],
         ["", "2.5 Pengujian Volume Cairan Tertinggal", "X", "", "", ""],
       ];
 
@@ -316,9 +262,7 @@ export default function HasilPengujianPage({
         },
       });
 
-      // Tanda Tangan & QR Code Halaman 2
-      // @ts-expect-error Mengambil posisi Y akhir tabel
-      const finalTableY = pdf.lastAutoTable.finalY || 120;
+      const finalTableY = pdf.lastAutoTable?.finalY || 120;
       y = finalTableY + 8;
 
       pdf.setFont("helvetica", "normal");
@@ -332,30 +276,25 @@ export default function HasilPengujianPage({
 
       y += 4;
       const qrCodeData = await fetch("/assets/qr-specimen.png")
-        .then((res) => {
+        .then(async (res) => {
           if (!res.ok) {
             return null;
           }
-          return res.blob();
+
+          const blob = await res.blob();
+          if (!blob) {
+            return null;
+          }
+
+          return new Promise<string | null>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              resolve(typeof reader.result === "string" ? reader.result : null);
+            };
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+          });
         })
-        .then((blob) =>
-          blob
-            ? new Promise<string | null>((resolve) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result as string);
-              reader.onerror = () => resolve(null);
-              reader.readAsDataURL(blob);
-            })
-<<<<<<< HEAD
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result as string);
-              reader.onerror = () => resolve(null);
-              reader.readAsDataURL(blob);
-            })
-=======
->>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
-            : null,
-        )
         .catch(() => null);
 
       if (qrCodeData) {
@@ -424,34 +363,26 @@ export default function HasilPengujianPage({
     },
     {
       label: "Petugas 1",
-      value:
-        formData?.step1?.dataPengujian?.namaPetugas1 || "Ahmad Fauzi, S.T.",
+      value: formData?.step1?.dataPengujian?.namaPetugas1 || "Ahmad Fauzi, S.T.",
     },
     {
       label: "Petugas 2",
-      value:
-        formData?.step1?.dataPengujian?.namaPetugas2 || "Siti Rahayu, S.T.",
+      value: formData?.step1?.dataPengujian?.namaPetugas2 || "Siti Rahayu, S.T.",
     },
   ];
 
   const checklist = formData?.step1?.checklist || [];
   const cerapan = formData?.step2?.cerapan || [];
 
-  const checklistTidak = checklist.filter(
-    (item) => item.penilaian === "tidak",
-  ).length;
-  const cerapanTidakLolos = cerapan.filter(
-    (item) => item.status === "tidak_lolos",
-  ).length;
+  const checklistTidak = checklist.filter((item) => item.penilaian === "tidak").length;
+  const cerapanTidakLolos = cerapan.filter((item) => item.status === "tidak_lolos").length;
   const totalGagal = checklistTidak + cerapanTidakLolos;
   const isSuccess = totalGagal === 0;
 
   const hasData = checklist.length > 0 || cerapan.length > 0;
   const displayDiperiksa = hasData ? checklist.length + cerapan.length : 12;
   const displayGagal = hasData ? totalGagal : 0;
-  const displayLolos = hasData
-    ? Math.max(displayDiperiksa - displayGagal, 0)
-    : 12;
+  const displayLolos = hasData ? Math.max(displayDiperiksa - displayGagal, 0) : 12;
   const displayIsSuccess = hasData ? isSuccess : true;
 
   const parameterData = [
@@ -545,20 +476,16 @@ export default function HasilPengujianPage({
 
   return (
     <div className="min-h-screen bg-[#F9F9F9] w-full">
-      
       <div className="px-8 py-8 md:px-12 md:py-12 max-w-[1100px] mx-auto">
         <Stepper
           steps={["Pemeriksaan Awal", "Pengujian/Pemeriksaan", "Hasil"]}
           currentStep={2}
         />
+
         <div className="flex flex-col gap-[40px]">
           <PageHeader
             title="Hasil Keseluruhan Pengujian"
             description="Evaluasi lengkap semua parameter pengujian Pompa Ukur BBM"
-<<<<<<< HEAD
-            description="Evaluasi lengkap semua parameter pengujian Pompa Ukur BBM"
-=======
->>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
           />
 
           <ResultCard isSuccess={displayIsSuccess} />
@@ -567,10 +494,7 @@ export default function HasilPengujianPage({
             lolos={displayLolos}
             gagal={displayGagal}
           />
-          <InfoCard
-            identitasAlat={identitasAlat}
-            dataPengujian={dataPengujian}
-          />
+          <InfoCard identitasAlat={identitasAlat} dataPengujian={dataPengujian} />
           <ParameterTable data={parameterData} />
 
           <div className="flex gap-[40px]">
