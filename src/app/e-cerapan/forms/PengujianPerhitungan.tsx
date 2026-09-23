@@ -1,15 +1,16 @@
-// src/app/e-cerapan/pengujian/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar } from "lucide-react";
-import Breadcrumb from "@/components/e-cerapan/layout/Breadcrumb";
-import PageHeader from "@/components/e-cerapan/ui/PageHeader";
-import FormField from "@/components/e-cerapan/ui/FormField";
+import PageHeader from "@/components/e-cerapan/layout/PageHeader";
 import Stepper from "@/components/e-cerapan/layout/Stepper";
-import SectionCard from "@/components/e-cerapan/ui/SectionCard";
-import SummaryCard from "@/components/e-cerapan/ui/SummaryCard";
+import FormCard from "@/components/e-cerapan/form/FormCard";
+import FormField from "@/components/e-cerapan/form/FormField";
+import SummaryCard from "@/components/e-cerapan/cards/SummaryCard";
+import Card from "@/components/ui/Card";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+import Badge from "@/components/ui/Badge";
 import {
   WizardStepProps,
   Step2Data,
@@ -18,9 +19,6 @@ import {
   Totalisator,
   CerapanItem,
 } from "@/types/wizard";
-
-const INPUT_CLASS =
-  "w-full px-4 py-3 rounded-lg border border-gray-300 text-[14px] text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2479BC]/30 focus:border-[#2479BC] transition-colors disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed";
 
 function parseNum(val: string | undefined | null): number {
   if (!val) return NaN;
@@ -38,6 +36,7 @@ export default function PengujianPerhitunganPage({
   const router = useRouter();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (!updateFormData) {
       router.replace("/e-cerapan");
     }
@@ -47,38 +46,37 @@ export default function PengujianPerhitunganPage({
   const step1IdentitasUTTP = formData?.step1?.identitasUTTP;
 
   const dataPengujian = {
-    nomorOrder: step1DataPengujian?.nomorOrder || "ORD-2024-0847",
-    noSPBU: step1DataPengujian?.noSPBU || "34.121.01",
-    namaPemilik: step1DataPengujian?.namaPemilik || "PT. Pertamina Retail",
-    nomorPompaUkur: step1DataPengujian?.namaPompaUkur || "PU-001",
+    nomorOrder: step1DataPengujian?.nomorOrder || "",
+    noSPBU: step1DataPengujian?.noSPBU || "",
+    namaPemilik: step1DataPengujian?.namaPemilik || "",
+    nomorPompaUkur: step1DataPengujian?.namaPompaUkur || "",
     merekTipe:
       step1IdentitasUTTP?.merek && step1IdentitasUTTP?.tipeModel
         ? `${step1IdentitasUTTP.merek} ${step1IdentitasUTTP.tipeModel}`
-        : step1IdentitasUTTP?.merek || "Tokheim Quantium 310",
-    nomorSeri: step1IdentitasUTTP?.nomorSeri || "SN-2023-TKH-0456",
+        : step1IdentitasUTTP?.merek || "",
+    nomorSeri: step1IdentitasUTTP?.nomorSeri || "",
   };
 
   const [dataNozzle, setDataNozzle] = useState<DataNozzle>(() => ({
-    identitas: formData?.step2?.dataNozzle?.identitas || "Nozzle 1",
-    jenisCairan:
-      formData?.step2?.dataNozzle?.jenisCairan || "Pertalite (RON 90)",
-    hargaSatuan: formData?.step2?.dataNozzle?.hargaSatuan || "10000",
+    identitas: formData?.step2?.dataNozzle?.identitas || "",
+    jenisCairan: formData?.step2?.dataNozzle?.jenisCairan || "",
+    hargaSatuan: formData?.step2?.dataNozzle?.hargaSatuan || "",
   }));
 
   const [dataBejana, setDataBejana] = useState<DataBejana>(() => ({
-    merek: formData?.step2?.dataBejana?.merek || "Pertamina Calibration",
-    tipe: formData?.step2?.dataBejana?.tipe || "BU-20L",
-    nomorSeri: formData?.step2?.dataBejana?.nomorSeri || "BJ-2023-0012",
-    volNominal: formData?.step2?.dataBejana?.volNominal || "20",
-    volSebenarnya: formData?.step2?.dataBejana?.volSebenarnya || "19.998",
-    skalaUtama: formData?.step2?.dataBejana?.skalaUtama || "0.05",
-    tglVerifikasi: formData?.step2?.dataBejana?.tglVerifikasi || "2023-12-22",
+    merek: formData?.step2?.dataBejana?.merek || "",
+    tipe: formData?.step2?.dataBejana?.tipe || "",
+    nomorSeri: formData?.step2?.dataBejana?.nomorSeri || "",
+    volNominal: formData?.step2?.dataBejana?.volNominal || "",
+    volSebenarnya: formData?.step2?.dataBejana?.volSebenarnya || "",
+    skalaUtama: formData?.step2?.dataBejana?.skalaUtama || "",
+    tglVerifikasi: formData?.step2?.dataBejana?.tglVerifikasi || "",
   }));
 
   const [totalisator, setTotalisator] = useState<Totalisator>(() => ({
-    sebelumUji: formData?.step2?.totalisator?.sebelumUji || "15432,000",
-    sesudahUji: formData?.step2?.totalisator?.sesudahUji || "15492,000",
-    totalTerpakai: formData?.step2?.totalisator?.totalTerpakai || "60.000 L",
+    sebelumUji: formData?.step2?.totalisator?.sebelumUji || "",
+    sesudahUji: formData?.step2?.totalisator?.sesudahUji || "",
+    totalTerpakai: formData?.step2?.totalisator?.totalTerpakai || "",
   }));
 
   const [cerapan, setCerapan] = useState<CerapanItem[]>(() => {
@@ -87,25 +85,25 @@ export default function PengujianPerhitunganPage({
     }
     return [
       {
-        volNominal: "20",
-        penunjukan: "20,050",
-        volSebenarnya: "19,980",
-        kesalahan: "+0.3504",
-        status: "lolos",
+        volNominal: "",
+        penunjukan: "",
+        volSebenarnya: "",
+        kesalahan: "",
+        status: "",
       },
       {
-        volNominal: "20",
-        penunjukan: "20,080",
-        volSebenarnya: "20,01",
-        kesalahan: "+0.3498",
-        status: "lolos",
+        volNominal: "",
+        penunjukan: "",
+        volSebenarnya: "",
+        kesalahan: "",
+        status: "",
       },
       {
-        volNominal: "20",
-        penunjukan: "20,150",
-        volSebenarnya: "19,950",
-        kesalahan: "+0.7500",
-        status: "tidak_lolos",
+        volNominal: "",
+        penunjukan: "",
+        volSebenarnya: "",
+        kesalahan: "",
+        status: "",
       },
     ];
   });
@@ -217,86 +215,140 @@ export default function PengujianPerhitunganPage({
     repeatabilityStatus = repeatabilityVal <= 0.3 ? "LOLOS" : "TIDAK LOLOS";
   }
 
-  return (
-    <div className="min-h-screen bg-[#F9F9F9] w-full">
-      <div className="px-8 py-8 md:px-12 md:py-12 max-w-[1100px] mx-auto space-y-8">
-        <Breadcrumb
-          items={[
-            { label: "Home", href: "/" },
-            { label: "E-Cerapan", href: "/e-cerapan" },
-            { label: "Pengujian & Perhitungan" },
-          ]}
-        />
+  const fillDummyData = () => {
+    setDataNozzle({
+      identitas: "Nozzle 1",
+      jenisCairan: "Pertalite (RON 90)",
+      hargaSatuan: "10000",
+    });
+    setDataBejana({
+      merek: "Pertamina Calibration",
+      tipe: "BU-20L",
+      nomorSeri: "BJ-2023-0012",
+      volNominal: "20",
+      volSebenarnya: "19.998",
+      skalaUtama: "0.05",
+      tglVerifikasi: "2023-12-22",
+    });
+    setTotalisator({
+      sebelumUji: "15432,000",
+      sesudahUji: "15492,000",
+      totalTerpakai: "60.000 L",
+    });
+    setCerapan([
+      {
+        volNominal: "20",
+        penunjukan: "20,050",
+        volSebenarnya: "19,980",
+        kesalahan: "+0.3504",
+        status: "lolos",
+      },
+      {
+        volNominal: "20",
+        penunjukan: "20,080",
+        volSebenarnya: "20,010",
+        kesalahan: "+0.3498",
+        status: "lolos",
+      },
+      {
+        volNominal: "20",
+        penunjukan: "20,040",
+        volSebenarnya: "19,990",
+        kesalahan: "+0.2501",
+        status: "lolos",
+      },
+    ]);
+  };
 
+  return (
+    <div className="min-h-screen bg-primay w-full">
+      <div className="px-8 py-8 md:px-12 md:py-12 max-w-[1100px] mx-auto space-y-8 pb-16">
         <Stepper
           steps={["Pemeriksaan Awal", "Pengujian & Perhitungan", "Hasil"]}
           currentStep={1}
         />
 
-        <PageHeader
-          title="Pemeriksaan Pengujian & Perhitungan Awal"
-          subtitle="Pompa Ukur BBM — Input data pengujian dan cerapan"
-        />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-7">
+          <PageHeader
+            title="Pemeriksaan Pengujian & Perhitungan Awal"
+            description="Pompa Ukur BBM — Input data pengujian dan cerapan"
+            className="mb-0"
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fillDummyData}
+            className="self-start sm:self-auto border-dashed border-amber-400 bg-amber-50 text-amber-800 hover:bg-amber-100 text-xs font-semibold gap-1.5"
+            title="Isi otomatis data testing untuk memudahkan pengujian"
+          >
+            ⚡ Isi Cepat (Testing)
+          </Button>
+        </div>
 
-        <SectionCard title="Data Pengujian">
+        {/* ═══ SECTION 1: Data Pengujian (Readonly from Step 1) ═══ */}
+        <FormCard
+          title="Data Pengujian"
+          className="mb-7"
+          headerClassName="bg-gray-200 px-5 py-3"
+          contentClassName="p-5"
+        >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
             <FormField label="Nomor Order">
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. ORD-2024-0847"
                 value={dataPengujian.nomorOrder}
                 disabled
               />
             </FormField>
             <FormField label="No. SPBU">
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. 34.121.01"
                 value={dataPengujian.noSPBU}
                 disabled
               />
             </FormField>
             <FormField label="Nama Pemilik/Penanggung Jawab">
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. PT. Pertamina Retail"
                 value={dataPengujian.namaPemilik}
                 disabled
               />
             </FormField>
             <FormField label="Nomor Pompa Ukur">
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. PU-001"
                 value={dataPengujian.nomorPompaUkur}
                 disabled
               />
             </FormField>
             <FormField label="Merek/Tipe">
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. Tokheim Quantium 310"
                 value={dataPengujian.merekTipe}
                 disabled
               />
             </FormField>
             <FormField label="Nomor Seri">
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. SN-2023-TKH-0456"
                 value={dataPengujian.nomorSeri}
                 disabled
               />
             </FormField>
           </div>
-        </SectionCard>
+        </FormCard>
 
-        <SectionCard title="Data Pengujian Nozzle">
+        {/* ═══ SECTION 2: Data Pengujian Nozzle ═══ */}
+        <FormCard
+          title="Data Pengujian Nozzle"
+          className="mb-7"
+          headerClassName="bg-gray-200 px-5 py-3"
+          contentClassName="p-5"
+        >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
             <FormField label="Identitas Nozzle" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. Nozzle 1"
                 value={dataNozzle.identitas}
                 onChange={(e) =>
                   setDataNozzle({ ...dataNozzle, identitas: e.target.value })
@@ -304,9 +356,8 @@ export default function PengujianPerhitunganPage({
               />
             </FormField>
             <FormField label="Jenis Cairan" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. Pertalite (RON 90)"
                 value={dataNozzle.jenisCairan}
                 onChange={(e) =>
                   setDataNozzle({ ...dataNozzle, jenisCairan: e.target.value })
@@ -314,9 +365,8 @@ export default function PengujianPerhitunganPage({
               />
             </FormField>
             <FormField label="Harga Satuan (Rp/L)" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. 10000"
                 value={dataNozzle.hargaSatuan}
                 onChange={(e) =>
                   setDataNozzle({ ...dataNozzle, hargaSatuan: e.target.value })
@@ -324,14 +374,19 @@ export default function PengujianPerhitunganPage({
               />
             </FormField>
           </div>
-        </SectionCard>
+        </FormCard>
 
-        <SectionCard title="Data Bejana Ukur">
+        {/* ═══ SECTION 3: Data Bejana Ukur ═══ */}
+        <FormCard
+          title="Data Bejana Ukur"
+          className="mb-7"
+          headerClassName="bg-gray-200 px-5 py-3"
+          contentClassName="p-5"
+        >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
             <FormField label="Merek" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. Pertamina Calibration"
                 value={dataBejana.merek}
                 onChange={(e) =>
                   setDataBejana({ ...dataBejana, merek: e.target.value })
@@ -339,9 +394,8 @@ export default function PengujianPerhitunganPage({
               />
             </FormField>
             <FormField label="Tipe/Model" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. BU-20L"
                 value={dataBejana.tipe}
                 onChange={(e) =>
                   setDataBejana({ ...dataBejana, tipe: e.target.value })
@@ -349,9 +403,8 @@ export default function PengujianPerhitunganPage({
               />
             </FormField>
             <FormField label="Nomor Seri" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. BJ-2023-0012"
                 value={dataBejana.nomorSeri}
                 onChange={(e) =>
                   setDataBejana({ ...dataBejana, nomorSeri: e.target.value })
@@ -359,9 +412,8 @@ export default function PengujianPerhitunganPage({
               />
             </FormField>
             <FormField label="Volume Nominal (L)" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. 20"
                 value={dataBejana.volNominal}
                 onChange={(e) =>
                   setDataBejana({ ...dataBejana, volNominal: e.target.value })
@@ -369,9 +421,8 @@ export default function PengujianPerhitunganPage({
               />
             </FormField>
             <FormField label="Volume Sebenarnya (L)" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. 19.998"
                 value={dataBejana.volSebenarnya}
                 onChange={(e) =>
                   setDataBejana({
@@ -382,9 +433,8 @@ export default function PengujianPerhitunganPage({
               />
             </FormField>
             <FormField label="Skala Utama Sebenarnya (L)" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. 0.05"
                 value={dataBejana.skalaUtama}
                 onChange={(e) =>
                   setDataBejana({ ...dataBejana, skalaUtama: e.target.value })
@@ -392,33 +442,31 @@ export default function PengujianPerhitunganPage({
               />
             </FormField>
             <FormField label="Tanggal Verifikasi Terakhir" required>
-              <div className="relative">
-                <input
-                  type="date"
-                  className={INPUT_CLASS}
-                  value={dataBejana.tglVerifikasi}
-                  onChange={(e) =>
-                    setDataBejana({
-                      ...dataBejana,
-                      tglVerifikasi: e.target.value,
-                    })
-                  }
-                />
-                <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-              </div>
+              <Input
+                type="date"
+                value={dataBejana.tglVerifikasi}
+                onChange={(e) =>
+                  setDataBejana({
+                    ...dataBejana,
+                    tglVerifikasi: e.target.value,
+                  })
+                }
+              />
             </FormField>
           </div>
-        </SectionCard>
+        </FormCard>
 
-        <SectionCard
+        {/* ═══ SECTION 4: Totalisator ═══ */}
+        <FormCard
           title="Totalisator"
-          subtitle="Penunjukan meter pompa sebelum dan sesudah pengujian"
+          className="mb-7"
+          headerClassName="bg-gray-200 px-5 py-3"
+          contentClassName="p-5"
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
             <FormField label="Sebelum Uji — a (L)" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. 15432,000"
                 value={totalisator.sebelumUji}
                 onChange={(e) =>
                   handleTotalisatorChange("sebelumUji", e.target.value)
@@ -426,9 +474,8 @@ export default function PengujianPerhitunganPage({
               />
             </FormField>
             <FormField label="Sesudah Uji — b (L)" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+              <Input
+                placeholder="cth. 15492,000"
                 value={totalisator.sesudahUji}
                 onChange={(e) =>
                   handleTotalisatorChange("sesudahUji", e.target.value)
@@ -436,65 +483,49 @@ export default function PengujianPerhitunganPage({
               />
             </FormField>
             <FormField label="Total Terpakai — (b-a)">
-              <input
-                type="text"
-                className={`${INPUT_CLASS} font-semibold`}
+              <Input
+                placeholder="Otomatis terhitung"
+                className="font-semibold text-black"
                 value={totalisator.totalTerpakai}
                 disabled
               />
             </FormField>
           </div>
-        </SectionCard>
+        </FormCard>
 
-        {/* ═══ SECTION 5: Input Cerapan (Dynamic Colors) ═══ */}
-        <div className="bg-[#F3F4F6] rounded-xl border border-gray-200 p-6 md:p-8 space-y-6">
-          <div className="mb-2">
-            <h3 className="font-semibold text-gray-800 text-lg">
-              Input Cerapan
-            </h3>
-            <p className="text-[14px] text-gray-500">
-              Masukkan data 3 kali penyerahan untuk masing-masing nozzle
-            </p>
-          </div>
-
+        {/* ═══ SECTION 5: Input Cerapan ═══ */}
+        <FormCard
+          title="Input Cerapan"
+          className="mb-7"
+          headerClassName="bg-gray-200 px-5 py-3"
+          contentClassName="p-5 space-y-6"
+        >
           {cerapan.map((item, index) => {
             const calc = cerapanCalculations[index];
-            const isFilled = calc.isFilled;
-            const isError = calc.status === "tidak_lolos";
-
-            // Toggle classes based on status
-            const badgeClasses = isFilled
-              ? isError
-                ? "bg-red-50 text-red-500 border-red-500"
-                : "bg-[#64CC4A]/10 text-[#64CC4A] border-[#64CC4A]"
-              : "hidden";
-
-            const inputBorderClasses = isFilled
-              ? isError
-                ? "border-red-500 text-red-500 focus:ring-red-500/30"
-                : "border-[#64CC4A] text-[#64CC4A] focus:ring-[#64CC4A]/30"
-              : "border-gray-300 text-gray-800 focus:ring-[#2479BC]/30";
 
             return (
-              <div
+              <Card
                 key={index}
-                className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm"
+                className="p-5 border border-gray-200 shadow-sm bg-white"
               >
-                <div className="flex justify-between items-center mb-5">
-                  <h4 className="font-bold text-gray-800">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="font-semibold text-sm text-black">
                     Cerapan {index + 1}
                   </h4>
-                  <span
-                    className={`px-4 py-1.5 border rounded-full text-[13px] font-semibold transition-colors ${badgeClasses}`}
-                  >
-                    E = {calc.errorStr} %
-                  </span>
+                  {calc.isFilled && (
+                    <Badge
+                      variant={
+                        calc.status === "tidak_lolos" ? "danger" : "success"
+                      }
+                    >
+                      E = {calc.errorStr} %
+                    </Badge>
+                  )}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4">
                   <FormField label="Vol. Nominal (L)" required>
-                    <input
-                      type="text"
-                      className={INPUT_CLASS}
+                    <Input
+                      placeholder="cth. 20"
                       value={item.volNominal}
                       onChange={(e) =>
                         updateCerapan(index, "volNominal", e.target.value)
@@ -502,9 +533,8 @@ export default function PengujianPerhitunganPage({
                     />
                   </FormField>
                   <FormField label="Penunjukan Cerapan (L)" required>
-                    <input
-                      type="text"
-                      className={INPUT_CLASS}
+                    <Input
+                      placeholder="cth. 20,050"
                       value={item.penunjukan}
                       onChange={(e) =>
                         updateCerapan(index, "penunjukan", e.target.value)
@@ -512,9 +542,8 @@ export default function PengujianPerhitunganPage({
                     />
                   </FormField>
                   <FormField label="Vol. Sebenarnya (L)" required>
-                    <input
-                      type="text"
-                      className={INPUT_CLASS}
+                    <Input
+                      placeholder="cth. 19,980"
                       value={item.volSebenarnya}
                       onChange={(e) =>
                         updateCerapan(index, "volSebenarnya", e.target.value)
@@ -522,29 +551,34 @@ export default function PengujianPerhitunganPage({
                     />
                   </FormField>
                   <FormField label="Kesalahan (%)" required>
-                    <input
-                      type="text"
-                      className={`w-full px-4 py-3 rounded-lg border bg-white text-[14px] font-semibold placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors ${inputBorderClasses}`}
+                    <Input
                       value={
                         calc.isFilled ? `${calc.errorStr}%` : item.kesalahan
                       }
-                      onChange={(e) =>
-                        updateCerapan(index, "kesalahan", e.target.value)
+                      placeholder="Otomatis terhitung"
+                      readOnly
+                      className={
+                        calc.isFilled
+                          ? calc.status === "tidak_lolos"
+                            ? "border-danger text-danger bg-red-50/40 font-bold focus:border-danger focus:ring-danger"
+                            : "border-success text-success bg-green-50/40 font-bold focus:border-success focus:ring-success"
+                          : "bg-gray-50 text-neutral cursor-not-allowed"
                       }
                     />
                   </FormField>
                 </div>
-              </div>
+              </Card>
             );
           })}
-        </div>
+        </FormCard>
 
         {/* ═══ SECTION 6: Ringkasan Perhitungan ═══ */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 md:p-8">
-          <h3 className="font-bold text-[#2479BC] text-xl mb-6">
-            Ringkasan Perhitungan
-          </h3>
-
+        <FormCard
+          title="Ringkasan Perhitungan"
+          className="mb-7"
+          headerClassName="bg-gray-200 px-5 py-3"
+          contentClassName="p-5"
+        >
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             {cerapanCalculations.map((calc, idx) => (
               <SummaryCard
@@ -605,11 +639,14 @@ export default function PengujianPerhitunganPage({
               variant="neutral"
             />
           </div>
-        </div>
+        </FormCard>
 
+        {/* ═══ Action Buttons ═══ */}
         <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full sm:w-1/2"
             onClick={() => {
               if (prevStep) {
                 prevStep();
@@ -617,12 +654,14 @@ export default function PengujianPerhitunganPage({
                 router.push("/e-cerapan/pemeriksaanawal");
               }
             }}
-            className="w-full sm:w-1/2 py-4 rounded-xl text-[16px] font-semibold text-gray-700 bg-transparent border-2 border-gray-300 hover:bg-gray-50 transition-all active:scale-[0.99]"
           >
             Kembali
-          </button>
-          <button
-            type="button"
+          </Button>
+
+          <Button
+            variant="primary"
+            size="lg"
+            className="w-full sm:w-1/2"
             onClick={() => {
               const step2Payload: Step2Data = {
                 dataNozzle,
@@ -639,10 +678,9 @@ export default function PengujianPerhitunganPage({
                 router.push("/e-cerapan/hasilpengujian");
               }
             }}
-            className="w-full sm:w-1/2 py-4 rounded-xl text-[16px] font-semibold text-white bg-[#2479BC] hover:bg-[#1d6aa6] transition-all active:scale-[0.99]"
           >
             Lihat Hasil Evaluasi
-          </button>
+          </Button>
         </div>
       </div>
     </div>

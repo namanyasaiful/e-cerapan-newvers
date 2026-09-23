@@ -2,11 +2,21 @@
 
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Breadcrumb from "@/components/e-cerapan/layout/Breadcrumb";
 import Stepper from "@/components/e-cerapan/layout/Stepper";
-import StatusBanner from "@/components/e-cerapan/ui/StatusBanner";
-import StatCard from "@/components/e-cerapan/ui/StatCard";
+import StatusBanner from "@/components/e-cerapan/layout/StatusBanner";
+import StatCard from "@/components/e-cerapan/cards/StatCard";
 import { WizardStepProps } from "@/types/wizard";
+import Button from "@/components/ui/Button";
+import {
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeader,
+  TableCell,
+} from "@/components/ui/Table";
+import FormCard from "@/components/e-cerapan/form/FormCard";
+import Card from "@/components/ui/Card";
 
 // ─── Mock Data (Replace with data from state/API) ────────────
 
@@ -101,6 +111,7 @@ export default function HasilPemeriksaanAwalPage({
   const router = useRouter();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (!updateFormData) {
       router.replace("/e-cerapan");
     }
@@ -117,18 +128,27 @@ export default function HasilPemeriksaanAwalPage({
       formData?.step1?.dataPengujian?.nomorOrder || IDENTITAS_ALAT.nomorOrder,
   };
 
+  const identitasItems = [
+    { label: "Merek", value: identitasAlat.merek },
+    { label: "Tipe", value: identitasAlat.tipe },
+    { label: "No. Seri", value: identitasAlat.noSeri },
+    { label: "No. SPBU", value: identitasAlat.noSPBU },
+    { label: "Nama SPBU", value: identitasAlat.namaSPBU },
+    { label: "Nomor Order", value: identitasAlat.nomorOrder },
+  ];
+
   const checklistResults =
     formData?.step1?.checklist && formData.step1.checklist.length > 0
       ? formData.step1.checklist.map((item, index) => ({
-          no: item.no || index + 1,
-          deskripsi: item.uraian || `Parameter ${index + 1}`,
-          penilaian:
-            item.penilaian === "ya"
-              ? "Ya"
-              : item.penilaian === "tidak"
-                ? "Tidak"
-                : "-",
-        }))
+        no: item.no || index + 1,
+        deskripsi: item.uraian || `Parameter ${index + 1}`,
+        penilaian:
+          item.penilaian === "ya"
+            ? "Ya"
+            : item.penilaian === "tidak"
+              ? "Tidak"
+              : "-",
+      }))
       : CHECKLIST_RESULTS;
 
   // Derived statistics
@@ -144,16 +164,7 @@ export default function HasilPemeriksaanAwalPage({
   return (
     <div className="min-h-screen bg-primay w-full">
       <div className="px-8 py-8 md:px-12 md:py-12 max-w-[1100px] mx-auto space-y-8">
-        {/* Breadcrumb */}
-        <Breadcrumb
-          items={[
-            { label: "Home", href: "/" },
-            { label: "E-Cerapan", href: "/e-cerapan" },
-            { label: "Pemeriksaan Awal" },
-          ]}
-        />
 
-        {/* Stepper (Notice currentStep is adjusted visually) */}
         <Stepper
           steps={["Pemeriksaan Awal", "Pengujian & Perhitungan", "Hasil"]}
           currentStep={0}
@@ -176,117 +187,93 @@ export default function HasilPemeriksaanAwalPage({
           <StatCard
             value={totalParameter}
             label="Total Parameter"
-            valueColor="text-[#2479BC]"
+            valueColor="primary"
           />
           <StatCard
             value={memenuhiCount}
             label="Memenuhi"
-            valueColor="text-[#4ade80]"
+            valueColor="success"
           />
           <StatCard
             value={tidakMemenuhiCount}
             label="Tidak Memenuhi"
-            valueColor="text-red-500"
+            valueColor="danger"
           />
         </div>
 
         {/* 3. Tabel Rincian Hasil */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="bg-gray-200/60 px-6 py-4 border-b border-gray-200">
-            <h3 className="font-semibold text-gray-800">
-              Rincian Hasil Pemeriksaan
-            </h3>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-[14px]">
-              <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="text-left py-4 px-6 font-medium text-[#2479BC] w-[60px]">
-                    No
-                  </th>
-                  <th className="text-left py-4 px-6 font-medium text-[#2479BC]">
-                    Deskripsi
-                  </th>
-                  <th className="text-center py-4 px-6 font-medium text-[#2479BC] w-[150px]">
-                    Penilaian
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {checklistResults.map((item, index) => (
-                  <tr
-                    key={index}
-                    className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50"
-                  >
-                    <td className="py-4 px-6 text-gray-800 align-top font-semibold">
-                      {item.no}
-                    </td>
-                    <td className="py-4 px-6 text-gray-700 align-top whitespace-pre-line leading-relaxed">
-                      {item.deskripsi}
-                    </td>
-                    <td className="py-4 px-6 align-top text-center">
-                      <span
-                        className={`font-medium ${item.penilaian === "Ya" ? "text-[#4ade80]" : "text-red-500"}`}
-                      >
-                        {item.penilaian}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <FormCard
+          title="Rincian Hasil Pemeriksaan"
+          className="mb-7"
+          headerClassName="bg-gray-200/60 px-6 py-4"
+          contentClassName="p-0 overflow-hidden"
+        >
+          <Table className="text-[14px]">
+            {/* TABLE HEADER */}
+            <TableHead>
+              <TableRow>
+                <TableHeader className="py-4 px-6 w-[60px] text-left">
+                  No
+                </TableHeader>
+                <TableHeader className="py-4 px-6 text-left">
+                  Deskripsi
+                </TableHeader>
+                <TableHeader className="py-4 px-6 w-[150px] text-center">
+                  Penilaian
+                </TableHeader>
+              </TableRow>
+            </TableHead>
+
+            {/* TABLE BODY */}
+            <TableBody>
+              {checklistResults.map((item, index) => (
+                <TableRow key={index} className="hover:bg-gray-50/50">
+                  {/* NOMOR */}
+                  <TableCell className="py-4 px-6 align-top font-semibold text-gray-800">
+                    {item.no}
+                  </TableCell>
+
+                  {/* DESKRIPSI */}
+                  <TableCell className="py-4 px-6 align-top whitespace-pre-line leading-relaxed text-gray-700">
+                    {item.deskripsi}
+                  </TableCell>
+
+                  {/* PENILAIAN */}
+                  <TableCell className="py-4 px-6 align-top text-center">
+                    <span
+                      className={`font-medium ${item.penilaian === "Ya" ? "text-[#4ade80]" : "text-red-500"
+                        }`}
+                    >
+                      {item.penilaian}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </FormCard>
 
         {/* 4. Identitas Alat Card */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8">
-          <h3 className="font-bold text-[#2479BC] uppercase mb-6 tracking-wide">
+        <Card className="p-8">
+          <h3 className="font-bold text-primary uppercase mb-6 tracking-wide">
             Identitas Alat Yang Diperiksa
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-y-6 gap-x-8 text-[15px]">
-            <div className="flex gap-2">
-              <span className="text-gray-500 w-24">Merek:</span>
-              <span className="font-semibold text-gray-800">
-                {identitasAlat.merek}
-              </span>
-            </div>
-            <div className="flex gap-2">
-              <span className="text-gray-500 w-24">Tipe:</span>
-              <span className="font-semibold text-gray-800">
-                {identitasAlat.tipe}
-              </span>
-            </div>
-            <div className="flex gap-2">
-              <span className="text-gray-500 w-24">No. Seri:</span>
-              <span className="font-semibold text-gray-800">
-                {identitasAlat.noSeri}
-              </span>
-            </div>
-            <div className="flex gap-2">
-              <span className="text-gray-500 w-24">No. SPBU:</span>
-              <span className="font-semibold text-gray-800">
-                {identitasAlat.noSPBU}
-              </span>
-            </div>
-            <div className="flex gap-2">
-              <span className="text-gray-500 w-24">No. SPBU:</span>
-              <span className="font-semibold text-gray-800">
-                {identitasAlat.namaSPBU}
-              </span>
-            </div>
-            <div className="flex gap-2">
-              <span className="text-gray-500 w-24">Nomor Order:</span>
-              <span className="font-semibold text-gray-800">
-                {identitasAlat.nomorOrder}
-              </span>
-            </div>
-          </div>
-        </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-y-6 gap-x-8 text-[15px]">
+            {identitasItems.map((item, index) => (
+              <div key={index} className="flex gap-2">
+                <span className="text-neutral w-28 shrink-0">{item.label}:</span>
+                <span className="font-semibold text-black">{item.value}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
         {/* 5. Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full sm:w-1/2"
             onClick={() => {
               if (prevStep) {
                 prevStep();
@@ -294,12 +281,15 @@ export default function HasilPemeriksaanAwalPage({
                 router.push("/e-cerapan/pemeriksaanawal");
               }
             }}
-            className="w-full sm:w-1/2 py-4 rounded-xl text-[16px] font-semibold text-gray-700 bg-transparent border-2 border-gray-300 hover:bg-gray-50 transition-all active:scale-[0.99]"
           >
             Kembali ke Pemeriksaan
-          </button>
-          <button
-            type="button"
+          </Button>
+
+          <Button
+            variant="primary"
+            size="lg"
+            disabled={!isLolos}
+            className="w-full sm:w-1/2"
             onClick={() => {
               if (isLolos) {
                 if (nextStep) {
@@ -309,15 +299,9 @@ export default function HasilPemeriksaanAwalPage({
                 }
               }
             }}
-            disabled={!isLolos}
-            className={`w-full sm:w-1/2 py-4 rounded-xl text-[16px] font-semibold transition-all ${
-              isLolos
-                ? "bg-[#2479BC] text-white hover:bg-[#1d6aa6] active:scale-[0.99] cursor-pointer"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
           >
             Lanjut ke Pengujian
-          </button>
+          </Button>
         </div>
       </div>
     </div>

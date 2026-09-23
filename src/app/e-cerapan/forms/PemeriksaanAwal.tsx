@@ -2,13 +2,25 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar, AlertTriangle } from "lucide-react";
-import Breadcrumb from "@/components/e-cerapan/layout/Breadcrumb";
-import PageHeader from "@/components/e-cerapan/ui/PageHeader";
-import FormSection from "@/components/e-cerapan/ui/FormSection";
-import FormField from "@/components/e-cerapan/ui/FormField";
+import PageHeader from "@/components/e-cerapan/layout/PageHeader";
 import Stepper from "@/components/e-cerapan/layout/Stepper";
+import FormCard from "@/components/e-cerapan/form/FormCard";
+import FormField from "@/components/e-cerapan/form/FormField";
+import FormWarning from "@/components/e-cerapan/feedback/FormWarning";
+import ConfirmModal from "@/components/e-cerapan/feedback/ConfirmModal";
+import Input from "@/components/ui/Input";
+import RadioGroup from "@/components/ui/RadioGroup";
+import Textarea from "@/components/ui/Textarea";
+import Button from "@/components/ui/Button";
 import { WizardStepProps, Step1Data } from "@/types/wizard";
+import {
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeader,
+  TableCell,
+} from "@/components/ui/Table";
 
 interface DataPengujian {
   nomorOrder: string;
@@ -37,7 +49,7 @@ interface KondisiOperasi {
   nomorPencacahTipe: string;
 }
 
-interface ChecklistItem {
+interface ChecklistItemState {
   penilaian: "ya" | "tidak" | null;
   keterangan: string;
 }
@@ -45,22 +57,25 @@ interface ChecklistItem {
 // ─── Checklist Questions ─────────────────────────────────────
 
 const CHECKLIST_QUESTIONS = [
-  "Apakah PU BBM dilengkapi dengan Pencacah Tipe (hasil tanda tera)?\n• Apakah informasi pada plat identitas/shelter sesuai dengan Pencacah, spesifikasi, dan PU BBM sesuai dengan Pencacah/Tipe?",
-  "Apakah PU BBM sudah dioperasikan dengan benar?\n• Apakah sudah beroperasi/berjalan sesuai rutin dan tidak ada yang rusak?\n• Apakah sudah beroperasi sesuai standar/jam kerja?",
-  "Apakah sertifikasi yang sudah diperoleh pada proses pemeriksaan sudah lengkap dan sesuai?\n• Apakah identitas pada pelat/shelter lengkap dan sesuai?\n• Apakah identitas pada pelat/shelter memiliki trat pelat dan/atau informasi?",
+  `Apakah PU BBM dilengkapi dengan Persetujuan Tipe (untuk Tera)?
+- Apakah informasi pada pelat identitas sesuai dengan Persetujuan Tipe?
+- Apakah spesifikasi teknis PU BBM sesuai dengan Persetujuan Tipe?`,
+  `Apakah PU BBM sudah digunakan dengan benar?
+- Apakah tanda tera sebelumnya masih utuh dan tidak ada yang rusak?
+- Apakah tidak terdapat alat tambahan yang mengubah spesifikasi dan/atau memengaruhi hasil pengukuran PU BBM?`,
+  `Apakah semua deskripsi yang wajib jelas terpasang pada pelat identitas dan terpasang tetap pada PU BBM?
+- Apakah identitas pada pelat data lengkap sesuai syarat teknis?
+- Apakah identitas pada pelat data mudah terlihat, jelas dan mudah dibaca?`,
   "Apakah PU BBM dalam kondisi lengkap dan bersih?",
-  "Apakah pengukuran volume, harga satuan, dan total harga sesuai dengan yang tercatat?",
-  "Apakah tidak terdapat kerusakan atau cacat pada alat yang dapat mempengaruhi ketelitian?",
-  "Apakah Gallon/tangki bersih, tidak berkarat dan tidak berlubang atau pecah?",
-  "Apakah pengukuran volume, harga satuan, dan total harga sesuai dengan yang tercatat pada display?",
-  "Apakah (5 ons) dan bensin/minyak, bola dan batas dipoles, dsb, disiapkan sesuai operasi?",
-  "Apakah metering/lag meter sesuai dengan indikasi udara di dalam tabung pengukuran yang sama?",
-  "Apakah pada PU BBM tidak ditemukan adanya kebocoran atau permasalahan lain?",
-  "Apakah pada PU BBM tidak ditemukan adanya tu kesusutan atau permasalahan lainnya?",
+  "Apakah PU BBM terpasang dengan kokoh pada pondasinya atau pada sisi Tangki Ukur Mobil BBM?",
+  "Apakah tidak terdapat kerusakan pada penutup Perangkat Penunjuk?",
+  "Apakah Gelas Penglihat bersih serta penuh dengan produk?",
+  "Apakah penunjukan volume, harga satuan, dan total harga sesuai dengan Slang yang dipilih?",
+  "Apakah penunjukan volume, harga satuan, dan total harga sesuai dengan Slang yang dipilih?",
+  `Apakah Slang dalam kondisi baik, (pada slang apakah ditemukan kondisi seperti lecet, retak atau pembungkus Slangnya telah usang)?`,
+  "Apakah masing-masing nozzle menghentikan aliran cairan ketika dikembalikan ke tempat penyimpanannya?",
+  "Apakah pada PU BBM tidak ditemukan adanya kebocoran atau rembesan cairan?",
 ];
-
-const INPUT_CLASS =
-  "w-full px-4 py-3 rounded-lg border border-gray-300 text-[14px] text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2479BC]/30 focus:border-[#2479BC] transition-colors";
 
 export default function PemeriksaanAwalPage({
   formData,
@@ -76,7 +91,7 @@ export default function PemeriksaanAwalPage({
     }
   }, [updateFormData, router]);
 
-  const [dataPengujian, setDataPengujian] = useState<DataPengujian>(() => ({
+  const [formDataState, setFormDataState] = useState<DataPengujian>(() => ({
     nomorOrder: formData?.step1?.dataPengujian?.nomorOrder || "",
     namaPemilik: formData?.step1?.dataPengujian?.namaPemilik || "",
     nomorSIML: formData?.step1?.dataPengujian?.nomorSIML || "",
@@ -103,7 +118,7 @@ export default function PemeriksaanAwalPage({
     nomorPencacahTipe: formData?.step1?.kondisiOperasi?.nomorPencacahTipe || "",
   }));
 
-  const [checklist, setChecklist] = useState<ChecklistItem[]>(() => {
+  const [checklist, setChecklist] = useState<ChecklistItemState[]>(() => {
     if (
       formData?.step1?.checklist &&
       formData.step1.checklist.length === CHECKLIST_QUESTIONS.length
@@ -116,10 +131,13 @@ export default function PemeriksaanAwalPage({
     return CHECKLIST_QUESTIONS.map(() => ({ penilaian: null, keterangan: "" }));
   });
 
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
   // ─── Handlers ────────────────────────────────────────────────
 
   const updateDataPengujian = (field: keyof DataPengujian, value: string) => {
-    setDataPengujian((prev) => ({ ...prev, [field]: value }));
+    setFormDataState((prev) => ({ ...prev, [field]: value }));
   };
 
   const updateIdentitasUTTP = (field: keyof IdentitasUTTP, value: string) => {
@@ -132,7 +150,7 @@ export default function PemeriksaanAwalPage({
 
   const updateChecklist = (
     index: number,
-    field: keyof ChecklistItem,
+    field: keyof ChecklistItemState,
     value: string | null,
   ) => {
     setChecklist((prev) => {
@@ -145,14 +163,15 @@ export default function PemeriksaanAwalPage({
   // ─── Check if all mandatory fields and checklist items are filled ───
 
   const isDataPengujianFilled =
-    Boolean(dataPengujian.nomorOrder.trim()) &&
-    Boolean(dataPengujian.namaPemilik.trim()) &&
-    Boolean(dataPengujian.nomorSIML.trim()) &&
-    Boolean(dataPengujian.contactPerson.trim()) &&
-    Boolean(dataPengujian.namaPompaUkur.trim()) &&
-    Boolean(dataPengujian.tanggalPengujian.trim()) &&
-    Boolean(dataPengujian.namaPetugas1.trim()) &&
-    Boolean(dataPengujian.namaPetugas2.trim());
+    Boolean(formDataState.nomorOrder.trim()) &&
+    Boolean(formDataState.namaPemilik.trim()) &&
+    Boolean(formDataState.nomorSIML.trim()) &&
+    Boolean(formDataState.contactPerson.trim()) &&
+    Boolean(formDataState.alamatTerpasang.trim()) &&
+    Boolean(formDataState.namaPompaUkur.trim()) &&
+    Boolean(formDataState.tanggalPengujian.trim()) &&
+    Boolean(formDataState.namaPetugas1.trim()) &&
+    Boolean(formDataState.namaPetugas2.trim());
 
   const isIdentitasUTTPFilled =
     Boolean(identitasUTTP.merek.trim()) &&
@@ -175,21 +194,35 @@ export default function PemeriksaanAwalPage({
     isKondisiOperasiFilled &&
     allChecklistFilled;
 
-  // ─── Submit Handler ──────────────────────────────────────────
+  // ─── Validation & Submit Handlers ────────────────────────────
+
+  const handleValidate = () => {
+    setIsSubmitted(true);
+    if (!isFormValid) {
+      return;
+    }
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirm = () => {
+    setIsConfirmOpen(false);
+    handleSubmit();
+  };
 
   const handleSubmit = () => {
     if (!isFormValid) return;
     const payload: Step1Data = {
       dataPengujian: {
-        ...dataPengujian,
-        noSPBU: formData?.step1?.dataPengujian?.noSPBU || "34.121.01",
+        ...formDataState,
+        noSPBU: formData?.step1?.dataPengujian?.noSPBU || "",
       },
       identitasUTTP,
       kondisiOperasi,
       checklist: checklist.map((item, i) => ({
         no: i + 1,
         uraian: CHECKLIST_QUESTIONS[i],
-        ...item,
+        penilaian: item.penilaian,
+        keterangan: item.keterangan,
       })),
     };
 
@@ -201,186 +234,304 @@ export default function PemeriksaanAwalPage({
     }
   };
 
-  return (
-    <div className="min-h-screen  w-full">
-      <div className="px-8 py-8 md:px-12 md:py-12 max-w-[1100px] mx-auto">
-        {/* Breadcrumb */}
-        <Breadcrumb
-          items={[
-            { label: "Home", href: "/" },
-            { label: "E-Cerapan", href: "/e-cerapan" },
-            { label: "Pemeriksaan Awal" },
-          ]}
-        />
+  const fillDummyData = () => {
+    setFormDataState({
+      nomorOrder: "ORD-2024-0847",
+      namaPemilik: "PT. Pertamina Retail",
+      nomorSIML: "SIML-98421",
+      contactPerson: "Budi Santoso, 081234567890",
+      alamatTerpasang: "Jl. Pemuda No. 45, Jakarta",
+      namaPompaUkur: "PU-001",
+      tanggalPengujian: "2024-03-20",
+      namaPetugas1: "Ahmad Dahlan",
+      namaPetugas2: "Rudi Hartono",
+    });
+    setIdentitasUTTP({
+      merek: "Tokheim",
+      tipeModel: "Quantium 310",
+      nomorSeri: "SN-2023-TKH-0456",
+      jumlahNozzle: "2",
+      tahunPembuatan: "2022",
+    });
+    setKondisiOperasi({
+      ujiAlkMaksimum: "50",
+      ujiAlkMinimum: "5",
+      mfr: "2",
+      nomorPencacahTipe: "P1-X-Style-V2022",
+    });
+    setChecklist(
+      CHECKLIST_QUESTIONS.map(() => ({
+        penilaian: "ya",
+        keterangan: "Kondisi baik",
+      }))
+    );
+  };
 
+  return (
+    <div className="min-h-screen bg-primay w-full">
+      <div className="px-8 py-8 md:px-12 md:py-12 max-w-[1100px] mx-auto space-y-8 pb-16">
         {/* Stepper */}
         <Stepper
           steps={["Pemeriksaan Awal", "Pengujian/Pemeriksaan", "Hasil"]}
           currentStep={0}
         />
 
-        {/* Page Header */}
-        <PageHeader
-          title="Pemeriksaan Awal"
-          subtitle="Pompa Ukur BBM — Isi seluruh data awal cerapan/pemeriksaan."
-        />
+        {/* Page Header & Test Button */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-7">
+          <PageHeader
+            title="Pemeriksaan Awal"
+            description="Pompa Ukur BBM — Isi seluruh data dan checklist pemeriksaan"
+            className="mb-0"
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fillDummyData}
+            className="self-start sm:self-auto border-dashed border-amber-400 bg-amber-50 text-amber-800 hover:bg-amber-100 text-xs font-semibold gap-1.5"
+            title="Isi otomatis seluruh form dan checklist untuk kebutuhan testing"
+          >
+            ⚡ Isi Cepat (Testing)
+          </Button>
+        </div>
 
         {/* ═══ SECTION 1: Data Pengujian ═══ */}
-        <FormSection title="Data Pengujian">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
-            <FormField label="Nomor Order" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+        <FormCard
+          title="Data Pengujian"
+          className="mb-7"
+          headerClassName="bg-gray-200 px-5 py-3"
+          contentClassName="p-5"
+        >
+          <div className="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-2">
+            {/* NOMOR ORDER */}
+            <FormField
+              label="Nomor Order"
+              required
+              error={
+                isSubmitted && !formDataState.nomorOrder.trim()
+                  ? "Nomor order wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. ORD-001"
-                value={dataPengujian.nomorOrder}
-                onChange={(e) =>
-                  updateDataPengujian("nomorOrder", e.target.value)
-                }
+                value={formDataState.nomorOrder}
+                onChange={(e) => updateDataPengujian("nomorOrder", e.target.value)}
               />
             </FormField>
 
-            <FormField label="Nama Pemilik/Penanggung Jawab" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+            {/* NAMA PEMILIK */}
+            <FormField
+              label="Nama Pemilik/Penanggung Jawab"
+              required
+              error={
+                isSubmitted && !formDataState.namaPemilik.trim()
+                  ? "Nama pemilik wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. PT Pertamina Retail"
-                value={dataPengujian.namaPemilik}
-                onChange={(e) =>
-                  updateDataPengujian("namaPemilik", e.target.value)
-                }
+                value={formDataState.namaPemilik}
+                onChange={(e) => updateDataPengujian("namaPemilik", e.target.value)}
               />
             </FormField>
 
-            <FormField label="Nomor SIML" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+            {/* NOMOR SIML */}
+            <FormField
+              label="Nomor SIML"
+              required
+              error={
+                isSubmitted && !formDataState.nomorSIML.trim()
+                  ? "Nomor SIML wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. 01234"
-                value={dataPengujian.nomorSIML}
-                onChange={(e) =>
-                  updateDataPengujian("nomorSIML", e.target.value)
-                }
+                value={formDataState.nomorSIML}
+                onChange={(e) => updateDataPengujian("nomorSIML", e.target.value)}
               />
             </FormField>
 
-            <FormField label="Contact Person" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+            {/* CONTACT PERSON */}
+            <FormField
+              label="Contact Person"
+              required
+              error={
+                isSubmitted && !formDataState.contactPerson.trim()
+                  ? "Contact person wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. Budi Santoso, 081234567890"
-                value={dataPengujian.contactPerson}
+                value={formDataState.contactPerson}
                 onChange={(e) =>
                   updateDataPengujian("contactPerson", e.target.value)
                 }
               />
             </FormField>
 
-            <FormField label="Alamat Terpasang" className="md:col-span-2">
-              <input
-                type="text"
-                className={INPUT_CLASS}
+            {/* ALAMAT TERPASANG */}
+            <FormField
+              label="Alamat Terpasang"
+              required
+              className="md:col-span-2"
+              error={
+                isSubmitted && !formDataState.alamatTerpasang.trim()
+                  ? "Alamat terpasang wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. Jl. Indonesia 123"
-                value={dataPengujian.alamatTerpasang}
+                value={formDataState.alamatTerpasang}
                 onChange={(e) =>
                   updateDataPengujian("alamatTerpasang", e.target.value)
                 }
               />
             </FormField>
 
-            <FormField label="Nama Pompa Ukur" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+            {/* NAMA POMPA UKUR */}
+            <FormField
+              label="Nama Pompa Ukur"
+              required
+              error={
+                isSubmitted && !formDataState.namaPompaUkur.trim()
+                  ? "Nama pompa ukur wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. PU-001"
-                value={dataPengujian.namaPompaUkur}
+                value={formDataState.namaPompaUkur}
                 onChange={(e) =>
                   updateDataPengujian("namaPompaUkur", e.target.value)
                 }
               />
             </FormField>
 
-            <FormField label="Tanggal Pengujian" required>
-              <div className="relative">
-                <input
-                  type="date"
-                  className={INPUT_CLASS}
-                  value={dataPengujian.tanggalPengujian}
-                  onChange={(e) =>
-                    updateDataPengujian("tanggalPengujian", e.target.value)
-                  }
-                />
-                <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-              </div>
-            </FormField>
-
-            <FormField label="Nama Petugas 1" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
-                placeholder="cth. Budi Santoso"
-                value={dataPengujian.namaPetugas1}
+            {/* TANGGAL PENGUJIAN */}
+            <FormField
+              label="Tanggal Pengujian"
+              required
+              error={
+                isSubmitted && !formDataState.tanggalPengujian.trim()
+                  ? "Tanggal pengujian wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
+                type="date"
+                value={formDataState.tanggalPengujian}
                 onChange={(e) =>
-                  updateDataPengujian("namaPetugas1", e.target.value)
+                  updateDataPengujian("tanggalPengujian", e.target.value)
                 }
               />
             </FormField>
 
-            <FormField label="Nama Petugas 2" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+            {/* NAMA PETUGAS 1 */}
+            <FormField
+              label="Nama Petugas 1"
+              required
+              error={
+                isSubmitted && !formDataState.namaPetugas1.trim()
+                  ? "Nama petugas 1 wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. Budi Santoso"
-                value={dataPengujian.namaPetugas2}
-                onChange={(e) =>
-                  updateDataPengujian("namaPetugas2", e.target.value)
-                }
+                value={formDataState.namaPetugas1}
+                onChange={(e) => updateDataPengujian("namaPetugas1", e.target.value)}
+              />
+            </FormField>
+
+            {/* NAMA PETUGAS 2 */}
+            <FormField
+              label="Nama Petugas 2"
+              required
+              error={
+                isSubmitted && !formDataState.namaPetugas2.trim()
+                  ? "Nama petugas 2 wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
+                placeholder="cth. Budi Santoso"
+                value={formDataState.namaPetugas2}
+                onChange={(e) => updateDataPengujian("namaPetugas2", e.target.value)}
               />
             </FormField>
           </div>
-        </FormSection>
+        </FormCard>
 
         {/* ═══ SECTION 2: Identitas UTTP (Alat) ═══ */}
-        <FormSection title="Identitas UTTP (Alat)">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
-            <FormField label="Merek" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+        <FormCard
+          title="Identitas UTTP (Alat)"
+          className="mb-7"
+          headerClassName="bg-gray-200 px-5 py-3"
+          contentClassName="p-5"
+        >
+          <div className="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-3">
+            <FormField
+              label="Merek"
+              required
+              error={
+                isSubmitted && !identitasUTTP.merek.trim()
+                  ? "Merek wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. Gilbarco"
                 value={identitasUTTP.merek}
                 onChange={(e) => updateIdentitasUTTP("merek", e.target.value)}
               />
             </FormField>
 
-            <FormField label="Tipe/Model" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+            <FormField
+              label="Tipe/Model"
+              required
+              error={
+                isSubmitted && !identitasUTTP.tipeModel.trim()
+                  ? "Tipe/model wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. Encore Seri 1"
                 value={identitasUTTP.tipeModel}
-                onChange={(e) =>
-                  updateIdentitasUTTP("tipeModel", e.target.value)
-                }
+                onChange={(e) => updateIdentitasUTTP("tipeModel", e.target.value)}
               />
             </FormField>
 
-            <FormField label="Nomor Seri" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+            <FormField
+              label="Nomor Seri"
+              required
+              error={
+                isSubmitted && !identitasUTTP.nomorSeri.trim()
+                  ? "Nomor seri wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. SN-30092"
                 value={identitasUTTP.nomorSeri}
-                onChange={(e) =>
-                  updateIdentitasUTTP("nomorSeri", e.target.value)
-                }
+                onChange={(e) => updateIdentitasUTTP("nomorSeri", e.target.value)}
               />
             </FormField>
 
-            <FormField label="Jumlah Nozzle" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+            <FormField
+              label="Jumlah Nozzle"
+              required
+              error={
+                isSubmitted && !identitasUTTP.jumlahNozzle.trim()
+                  ? "Jumlah nozzle wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. 1"
                 value={identitasUTTP.jumlahNozzle}
                 onChange={(e) =>
@@ -389,10 +540,16 @@ export default function PemeriksaanAwalPage({
               />
             </FormField>
 
-            <FormField label="Tahun Pembuatan" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+            <FormField
+              label="Tahun Pembuatan"
+              required
+              error={
+                isSubmitted && !identitasUTTP.tahunPembuatan.trim()
+                  ? "Tahun pembuatan wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. 2020"
                 value={identitasUTTP.tahunPembuatan}
                 onChange={(e) =>
@@ -401,15 +558,26 @@ export default function PemeriksaanAwalPage({
               />
             </FormField>
           </div>
-        </FormSection>
+        </FormCard>
 
         {/* ═══ SECTION 3: Kondisi Operasi ═══ */}
-        <FormSection title="Kondisi Operasi">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
-            <FormField label="Uji Alk Maksimum (L/menit)" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+        <FormCard
+          title="Kondisi Operasi"
+          className="mb-7"
+          headerClassName="bg-gray-200 px-5 py-3"
+          contentClassName="p-5"
+        >
+          <div className="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-2">
+            <FormField
+              label="Uji Alk Maksimum (L/menit)"
+              required
+              error={
+                isSubmitted && !kondisiOperasi.ujiAlkMaksimum.trim()
+                  ? "Uji alk maksimum wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. 1"
                 value={kondisiOperasi.ujiAlkMaksimum}
                 onChange={(e) =>
@@ -418,10 +586,16 @@ export default function PemeriksaanAwalPage({
               />
             </FormField>
 
-            <FormField label="Uji Alk Minimum (L/menit)" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+            <FormField
+              label="Uji Alk Minimum (L/menit)"
+              required
+              error={
+                isSubmitted && !kondisiOperasi.ujiAlkMinimum.trim()
+                  ? "Uji alk minimum wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. 1"
                 value={kondisiOperasi.ujiAlkMinimum}
                 onChange={(e) =>
@@ -430,20 +604,32 @@ export default function PemeriksaanAwalPage({
               />
             </FormField>
 
-            <FormField label="MFR = Min Measured Quantity (L) (hasil)" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+            <FormField
+              label="MFR = Min Measured Quantity (L) (hasil)"
+              required
+              error={
+                isSubmitted && !kondisiOperasi.mfr.trim()
+                  ? "MFR wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. 1"
                 value={kondisiOperasi.mfr}
                 onChange={(e) => updateKondisiOperasi("mfr", e.target.value)}
               />
             </FormField>
 
-            <FormField label="Nomor Pencacah/Tipe" required>
-              <input
-                type="text"
-                className={INPUT_CLASS}
+            <FormField
+              label="Nomor Pencacah/Tipe"
+              required
+              error={
+                isSubmitted && !kondisiOperasi.nomorPencacahTipe.trim()
+                  ? "Nomor pencacah/tipe wajib diisi."
+                  : undefined
+              }
+            >
+              <Input
                 placeholder="cth. P1-X-Style-V2022"
                 value={kondisiOperasi.nomorPencacahTipe}
                 onChange={(e) =>
@@ -452,162 +638,151 @@ export default function PemeriksaanAwalPage({
               />
             </FormField>
           </div>
-        </FormSection>
+        </FormCard>
 
         {/* ═══ SECTION 4: Checklist Pemeriksaan ═══ */}
-        <FormSection title="Checklist Pemeriksaan">
-          <div className="overflow-x-auto">
-            <table className="w-full text-[14px]">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-3 font-semibold text-gray-700 w-[50px]">
-                    No
-                  </th>
-                  <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                    Uraian
-                  </th>
-                  <th className="text-center py-3 px-3 font-semibold text-gray-700 w-[120px]">
-                    Penilaian
-                  </th>
-                  <th className="text-left py-3 px-3 font-semibold text-gray-700 w-[200px]">
-                    Keterangan
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {CHECKLIST_QUESTIONS.map((question, index) => {
-                  const isYa = checklist[index].penilaian === "ya";
-                  const isTidak = checklist[index].penilaian === "tidak";
+        <FormCard
+          title="Checklist Pemeriksaan"
+          className="mb-5"
+          headerClassName="bg-gray-200 px-5 py-3"
+          contentClassName="p-0"
+        >
+          <Table className="min-w-[760px] table-fixed text-xs">
+            {/* TABLE HEADER */}
+            <TableHead>
+              <TableRow>
+                <TableHeader className="w-[6%] px-3 py-3 text-center">
+                  No
+                </TableHeader>
+                <TableHeader className="w-[49%] px-3 py-3 text-left">
+                  Deskripsi
+                </TableHeader>
+                <TableHeader className="w-[22%] px-3 py-3 text-center">
+                  Penilaian
+                </TableHeader>
+                <TableHeader className="w-[23%] px-3 py-3 text-left">
+                  Keterangan <span className="text-neutral">*opsional</span>
+                </TableHeader>
+              </TableRow>
+            </TableHead>
 
-                  return (
-                    <tr
-                      key={index}
-                      className="border-b border-gray-100 hover:bg-gray-50/50"
-                    >
-                      <td className="py-4 px-3 text-gray-600 align-top font-medium">
-                        {index + 1}
-                      </td>
-                      <td className="py-4 px-3 text-gray-700 align-top whitespace-pre-line leading-relaxed">
-                        {question}
-                      </td>
-                      <td className="py-4 px-3 align-top">
-                        <div className="flex items-center justify-center gap-4">
-                          {/* Tombol"Ya" */}
-                          <button
-                            type="button"
-                            // Jika sudah "ya", klik lagi akan mengubahnya jadi null (cancel). Jika belum, ubah jadi "ya"
-                            onClick={() =>
-                              updateChecklist(
-                                index,
-                                "penilaian",
-                                isYa ? null : "ya",
-                              )
-                            }
-                            className="flex items-center gap-1.5 cursor-pointer group focus:outline-none"
-                          >
-                            <div
-                              className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${
-                                isYa
-                                  ? "border-[#64CC4A]"
-                                  : "border-gray-300 group-hover:border-gray-400"
-                              }`}
-                            >
-                              {/* Lingkaran dalam (hijau solid tanpa hitam) */}
-                              {isYa && (
-                                <div className="w-2 h-2 rounded-full bg-[#64CC4A]" />
-                              )}
-                            </div>
-                            <span
-                              className={`text-[13px] transition-colors ${
-                                isYa
-                                  ? "text-[#64CC4A] font-bold"
-                                  : "text-gray-600 group-hover:text-gray-800"
-                              }`}
-                            >
-                              Ya
-                            </span>
-                          </button>
+            {/* TABLE BODY */}
+            <TableBody>
+              {CHECKLIST_QUESTIONS.map((question, index) => (
+                <TableRow key={index}>
+                  {/* NOMOR */}
+                  <TableCell className="px-3 py-3 text-center align-middle">
+                    {index + 1}
+                  </TableCell>
 
-                          {/* Tombol "Tidak" */}
-                          <button
-                            type="button"
-                            // Jika sudah "tidak", klik lagi akan mengubahnya jadi null (cancel). Jika belum, ubah jadi "tidak"
-                            onClick={() =>
-                              updateChecklist(
-                                index,
-                                "penilaian",
-                                isTidak ? null : "tidak",
-                              )
-                            }
-                            className="flex items-center gap-1.5 cursor-pointer group focus:outline-none"
-                          >
-                            <div
-                              className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${
-                                isTidak
-                                  ? "border-red-500"
-                                  : "border-gray-300 group-hover:border-gray-400"
-                              }`}
-                            >
-                              {/* Lingkaran dalam (merah solid) */}
-                              {isTidak && (
-                                <div className="w-2 h-2 rounded-full bg-red-500" />
-                              )}
-                            </div>
-                            <span
-                              className={`text-[13px] transition-colors ${
-                                isTidak
-                                  ? "text-red-500 font-bold"
-                                  : "text-gray-600 group-hover:text-gray-800"
-                              }`}
-                            >
-                              Tidak
-                            </span>
-                          </button>
-                        </div>
-                      </td>
-                      <td className="py-4 px-3 align-top">
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-300 text-[13px] text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2479BC]/30 focus:border-[#2479BC] transition-colors"
-                          placeholder="Keterangan..."
-                          value={checklist[index].keterangan}
-                          onChange={(e) =>
-                            updateChecklist(index, "keterangan", e.target.value)
-                          }
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                  {/* DESKRIPSI */}
+                  <TableCell className="whitespace-pre-line px-3 py-3 align-middle leading-[1.35]">
+                    {question}
+                  </TableCell>
 
-          {/* Warning */}
+                  {/* PENILAIAN */}
+                  <TableCell className="px-2 py-3 align-middle">
+                    <RadioGroup
+                      name={`penilaian-${index}`}
+                      value={checklist[index].penilaian ?? ""}
+                      onChange={(value) =>
+                        updateChecklist(
+                          index,
+                          "penilaian",
+                          value as "ya" | "tidak",
+                        )
+                      }
+                      options={[
+                        { label: "Ya", value: "ya" },
+                        { label: "Tidak", value: "tidak" },
+                      ]}
+                      className="justify-center gap-3"
+                      inputClassName="h-3.5 w-3.5"
+                    />
+                  </TableCell>
+
+                  {/* KETERANGAN */}
+                  <TableCell className="px-3 py-3 align-middle">
+                    <Textarea
+                      placeholder="Masukkan Keterangan"
+                      rows={1}
+                      value={checklist[index].keterangan}
+                      onChange={(e) =>
+                        updateChecklist(index, "keterangan", e.target.value)
+                      }
+                      className="min-h-[34px] resize-y px-2 py-2 text-[10px]"
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          {/* Warning Feedback Component */}
           {!isFormValid && (
-            <div className="flex items-center gap-3 mt-6 px-4 py-3 bg-amber-50 rounded-lg border border-amber-200">
-              <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
-              <p className="text-[14px] text-amber-700">
-                {!allChecklistFilled
-                  ? "Lengkapi semua penilaian checklist sebelum melanjutkan."
-                  : "Lengkapi seluruh data wajib (*) pada Data Pengujian, Identitas UTTP, dan Kondisi Operasi sebelum melanjutkan."}
-              </p>
+            <div className="px-5 pb-5 pt-4">
+              <FormWarning
+                message={
+                  !allChecklistFilled
+                    ? "Lengkapi semua penilaian checklist sebelum melanjutkan."
+                    : "Lengkapi seluruh data wajib (*) pada Data Pengujian, Identitas UTTP, dan Kondisi Operasi sebelum melanjutkan."
+                }
+              />
             </div>
           )}
-        </FormSection>
+        </FormCard>
 
-        {/* ═══ Submit Button ═══ */}
-        <button
-          onClick={handleSubmit}
-          disabled={!isFormValid}
-          className={`w-full py-4 rounded-xl text-[18px] font-semibold transition-all ${
-            isFormValid
-              ? "bg-[#2479BC] text-white hover:bg-[#1d6aa6] active:scale-[0.99] cursor-pointer"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
+        {/* ================================================
+            TOMBOL VALIDASI
+        ================================================ */}
+        <div className="mb-8">
+          <Button fullWidth onClick={handleValidate}>
+            Validasi Pemeriksaan
+          </Button>
+        </div>
+
+        {/* ================================================
+            CONFIRM MODAL
+        ================================================ */}
+        <ConfirmModal
+          open={isConfirmOpen}
+          onClose={() => setIsConfirmOpen(false)}
+          onConfirm={handleConfirm}
+          title="Konfirmasi Pemeriksaan"
+          description="Pastikan seluruh data dan checklist pemeriksaan telah sesuai sebelum melanjutkan proses."
+          confirmText="Konfirmasi"
+          cancelText="Batal"
         >
-          Validasi Pemeriksaan
-        </button>
+          <div className="space-y-3 border-y border-gray-200 py-4">
+            <div className="flex justify-between gap-4 text-sm">
+              <span className="text-neutral">Nomor Order</span>
+              <span className="text-right font-medium text-black">
+                {formDataState.nomorOrder || "-"}
+              </span>
+            </div>
+
+            <div className="flex justify-between gap-4 text-sm">
+              <span className="text-neutral">Nama Pemilik</span>
+              <span className="text-right font-medium text-black">
+                {formDataState.namaPemilik || "-"}
+              </span>
+            </div>
+
+            <div className="flex justify-between gap-4 text-sm">
+              <span className="text-neutral">Nama Pompa Ukur</span>
+              <span className="text-right font-medium text-black">
+                {formDataState.namaPompaUkur || "-"}
+              </span>
+            </div>
+
+            <div className="flex justify-between gap-4 text-sm">
+              <span className="text-neutral">Tanggal Pengujian</span>
+              <span className="text-right font-medium text-black">
+                {formDataState.tanggalPengujian || "-"}
+              </span>
+            </div>
+          </div>
+        </ConfirmModal>
       </div>
     </div>
   );

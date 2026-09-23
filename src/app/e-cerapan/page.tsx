@@ -1,7 +1,7 @@
 import React from "react";
 import Breadcrumb from "@/components/e-cerapan/layout/Breadcrumb";
 
-import InfoBanner from "@/components/e-cerapan/ui/InfoBanner";
+import InfoBanner from "@/components/e-cerapan/layout/InfoBanner";
 import PageHeader from "@/components/e-cerapan/layout/PageHeader";
 
 export default function ECerapanPage() {
