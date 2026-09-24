@@ -22,6 +22,11 @@ import InfoCard from "@/components/e-cerapan/ui/InfoCard";
 import ParameterTable from "@/components/e-cerapan/ui/ParameterTable";
 import ConfirmationModal from "@/components/e-cerapan/ui/ConfirmationModal";
 >>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
+import ResultCard from "@/components/e-cerapan/cards/ResultCard";
+import MetricSummary from "@/components/e-cerapan/cards/MetricSummary";
+import InfoCard from "@/components/e-cerapan/cards/InfoCard";
+import ParameterTable from "@/components/e-cerapan/table/ParameterTable";
+import ConfirmationModal from "@/components/e-cerapan/modal/ConfirmationModal";
 import { WizardStepProps } from "@/types/wizard";
 import StatCard from "@/components/e-cerapan/cards/StatCard";
 
