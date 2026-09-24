@@ -20,7 +20,11 @@ export default function NewPasswordPage() {
 
       <div className="flex w-full flex-col justify-between bg-white px-8 py-8 lg:w-1/2 lg:px-20 lg:py-10">
         <div className="w-full max-w-md mx-auto pt-2">
-          <ChevronButton onClick={() => router.back()} variant="primary" className="text-sm font-medium" />
+          <ChevronButton
+            onClick={() => router.back()}
+            variant="primary"
+            className="text-sm font-medium"
+          />
         </div>
 
         <div className="mx-auto flex w-full max-w-md my-auto flex-col justify-center py-6">
@@ -30,9 +34,7 @@ export default function NewPasswordPage() {
 
           <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
             <div className="space-y-2">
-              <label className="block text-sm  text-black">
-                Password
-              </label>
+              <label className="block text-sm  text-black">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -46,7 +48,11 @@ export default function NewPasswordPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-black bg-transparent border-none cursor-pointer"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -68,23 +74,22 @@ export default function NewPasswordPage() {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-black bg-transparent border-none cursor-pointer"
                 >
-                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
                 </button>
               </div>
             </div>
 
-            <Button
-              type="submit"
-              variant="primary"
-              size="md"
-              fullWidth
-            >
+            <Button type="submit" variant="primary" size="md" fullWidth>
               Simpan Password
             </Button>
           </form>
         </div>
 
-        
+        {/* tes */}
       </div>
     </main>
   );
