@@ -11,9 +11,6 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import ConfirmModal from "@/components/e-cerapan/feedback/ConfirmModal";
 import FormWarning from "@/components/e-cerapan/feedback/FormWarning";
-import FormCard from "@/components/e-cerapan/form/FormCard";
-import FormField from "@/components/e-cerapan/form/FormField";
-import SummaryCard from "@/components/e-cerapan/cards/SummaryCard";
 import {
   WizardStepProps,
   Step2Data,
@@ -288,51 +285,6 @@ export default function PengujianPerhitunganPage({
     repeatabilityStatus = repeatabilityVal <= 0.3 ? "LOLOS" : "TIDAK LOLOS";
   }
 
-  const fillDummyData = () => {
-    setDataNozzle({
-      identitas: "Nozzle 1",
-      jenisCairan: "Pertalite (RON 90)",
-      hargaSatuan: "10000",
-    });
-    setDataBejana({
-      merek: "Pertamina Calibration",
-      tipe: "BU-20L",
-      nomorSeri: "BJ-2023-0012",
-      volNominal: "20",
-      volSebenarnya: "19.998",
-      skalaUtama: "0.05",
-      tglVerifikasi: "2023-12-22",
-    });
-    setTotalisator({
-      sebelumUji: "15432,000",
-      sesudahUji: "15492,000",
-      totalTerpakai: "60.000 L",
-    });
-    setCerapan([
-      {
-        volNominal: "20",
-        penunjukan: "20,050",
-        volSebenarnya: "19,980",
-        kesalahan: "+0.3504",
-        status: "lolos",
-      },
-      {
-        volNominal: "20",
-        penunjukan: "20,080",
-        volSebenarnya: "20,010",
-        kesalahan: "+0.3498",
-        status: "lolos",
-      },
-      {
-        volNominal: "20",
-        penunjukan: "20,040",
-        volSebenarnya: "19,990",
-        kesalahan: "+0.2501",
-        status: "lolos",
-      },
-    ]);
-  };
-
   // Data Dummy untuk Testing
 
   // const fillDummyData = () => {
@@ -447,7 +399,6 @@ export default function PengujianPerhitunganPage({
     }
   };
 
->>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
   return (
     <div className="min-h-screen bg-primay w-full">
       <div className="px-8 py-8 md:px-12 md:py-12 max-w-[1100px] mx-auto space-y-8 pb-16">
@@ -468,7 +419,6 @@ export default function PengujianPerhitunganPage({
           />
           {/* Tombol Data Dummy untuk Testing */}
           {/* <Button
-<<<<<<< HEAD
             variant="outline"
             size="sm"
             onClick={fillDummyData}
@@ -477,55 +427,6 @@ export default function PengujianPerhitunganPage({
           >
             ⚡ Isi Cepat (Testing)
           </Button> */}
-        </div>
-
-        {/* ═══ SECTION 1: Data Pengujian (Readonly from Step 1) ═══ */}
-        <FormCard
-          title="Data Pengujian"
-          className="mb-7"
-          headerClassName="bg-gray-200 px-5 py-3"
-          contentClassName="p-5"
-        >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-7">
-          <PageHeader
-            title="Pemeriksaan Pengujian & Perhitungan Awal"
-            description="Pompa Ukur BBM — Input data pengujian dan cerapan"
-            className="mb-0"
-          />
-          {/* Tombol Data Dummy untuk Testing */}
-          {/* <Button
-            variant="outline"
-            size="sm"
-            onClick={fillDummyData}
-            className="self-start sm:self-auto border-dashed border-amber-400 bg-amber-50 text-amber-800 hover:bg-amber-100 text-xs font-semibold gap-1.5"
-            title="Isi otomatis data testing untuk memudahkan pengujian"
-          >
-            ⚡ Isi Cepat (Testing)
-          </Button> */}
-        </div>
-
-        {/* ═══ SECTION 1: Data Pengujian (Readonly from Step 1) ═══ */}
-        <FormCard
-          title="Data Pengujian"
-          className="mb-7"
-          headerClassName="bg-gray-200 px-5 py-3"
-          contentClassName="p-5"
-        >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-7">
-          <PageHeader
-            title="Pemeriksaan Pengujian & Perhitungan Awal"
-            description="Pompa Ukur BBM — Input data pengujian dan cerapan"
-            className="mb-0"
-          />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={fillDummyData}
-            className="self-start sm:self-auto border-dashed border-amber-400 bg-amber-50 text-amber-800 hover:bg-amber-100 text-xs font-semibold gap-1.5"
-            title="Isi otomatis data testing untuk memudahkan pengujian"
-          >
-            ⚡ Isi Cepat (Testing)
-          </Button>
         </div>
 
         {/* ═══ SECTION 1: Data Pengujian (Readonly from Step 1) ═══ */}
@@ -1111,14 +1012,12 @@ export default function PengujianPerhitunganPage({
             />
           </div>
         </FormCard>
-        </FormCard>
 
         {/* ═══ Feedback Warning jika belum lengkap saat submit ═══ */}
         {isSubmitted && !isFormValid && (
           <FormWarning message="Lengkapi seluruh field wajib (*) pada Data Nozzle, Bejana, Totalisator, dan Cerapan sebelum melanjutkan." />
         )}
 
-        {/* ═══ Action Buttons ═══ */}
         {/* ═══ Action Buttons ═══ */}
         <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
           <Button
@@ -1149,42 +1048,52 @@ export default function PengujianPerhitunganPage({
             size="lg"
             className="w-full sm:w-1/2"
             onClick={handleValidate}
-<<<<<<< HEAD
-          </Button>
-
-          <Button
-            variant="primary"
-            size="lg"
-            className="w-full sm:w-1/2"
-            onClick={handleValidate}
-          </Button>
-
-          <Button
-            variant="primary"
-            size="lg"
-            className="w-full sm:w-1/2"
-            onClick={() => {
-              const step2Payload: Step2Data = {
-                dataNozzle,
-                dataBejana,
-                totalisator,
-                cerapan,
-              };
-              if (updateFormData) {
-                updateFormData("step2", step2Payload);
-              }
-              if (nextStep) {
-                nextStep();
-              } else {
-                router.push("/e-cerapan/hasilpengujian");
-              }
-            }}
           >
             Lihat Hasil Evaluasi
           </Button>
           </Button>
           </Button>
         </div>
+
+        <ConfirmModal
+          open={isConfirmOpen}
+          onClose={() => setIsConfirmOpen(false)}
+          onConfirm={handleConfirm}
+          title="Konfirmasi Pengujian & Perhitungan"
+          description="Pastikan seluruh data pengujian nozzle, bejana, dan cerapan telah diinput dengan benar."
+          confirmText="Konfirmasi"
+          cancelText="Batal"
+        >
+          <div className="space-y-3 border-y border-gray-200 py-4">
+            <div className="flex justify-between gap-4 text-sm">
+              <span className="text-neutral">Identitas Nozzle</span>
+              <span className="text-right font-medium text-black">
+                {dataNozzle.identitas || "-"} ({dataNozzle.jenisCairan || "-"})
+              </span>
+            </div>
+
+            <div className="flex justify-between gap-4 text-sm">
+              <span className="text-neutral">Bejana Ukur</span>
+              <span className="text-right font-medium text-black">
+                {dataBejana.merek || "-"} {dataBejana.tipe || "-"}
+              </span>
+            </div>
+
+            <div className="flex justify-between gap-4 text-sm">
+              <span className="text-neutral">Totalisator Terpakai</span>
+              <span className="text-right font-medium text-black">
+                {totalisator.totalTerpakai || "-"}
+              </span>
+            </div>
+
+            <div className="flex justify-between gap-4 text-sm">
+              <span className="text-neutral">Kesalahan Rata-rata</span>
+              <span className="text-right font-medium text-black">
+                {averageErrorStr} ({averageErrorStatus || "—"})
+              </span>
+            </div>
+          </div>
+        </ConfirmModal>
 
         <ConfirmModal
           open={isConfirmOpen}
