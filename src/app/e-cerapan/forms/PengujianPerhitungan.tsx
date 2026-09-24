@@ -11,6 +11,8 @@ import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
+import ConfirmModal from "@/components/e-cerapan/feedback/ConfirmModal";
+import FormWarning from "@/components/e-cerapan/feedback/FormWarning";
 <<<<<<< HEAD
 import ConfirmModal from "@/components/e-cerapan/feedback/ConfirmModal";
 import FormWarning from "@/components/e-cerapan/feedback/FormWarning";
@@ -220,6 +222,118 @@ export default function PengujianPerhitunganPage({
     repeatabilityStatus = repeatabilityVal <= 0.3 ? "LOLOS" : "TIDAK LOLOS";
   }
 
+  // Data Dummy untuk Testing
+
+  // const fillDummyData = () => {
+  //   setDataNozzle({
+  //     identitas: "Nozzle 1",
+  //     jenisCairan: "Pertalite (RON 90)",
+  //     hargaSatuan: "10000",
+  //   });
+  //   setDataBejana({
+  //     merek: "Pertamina Calibration",
+  //     tipe: "BU-20L",
+  //     nomorSeri: "BJ-2023-0012",
+  //     volNominal: "20",
+  //     volSebenarnya: "19.998",
+  //     skalaUtama: "0.05",
+  //     tglVerifikasi: "2023-12-22",
+  //   });
+  //   setTotalisator({
+  //     sebelumUji: "15432,000",
+  //     sesudahUji: "15492,000",
+  //     totalTerpakai: "60.000 L",
+  //   });
+  //   setCerapan([
+  //     {
+  //       volNominal: "20",
+  //       penunjukan: "20,050",
+  //       volSebenarnya: "19,980",
+  //       kesalahan: "+0.3504",
+  //       status: "lolos",
+  //     },
+  //     {
+  //       volNominal: "20",
+  //       penunjukan: "20,080",
+  //       volSebenarnya: "20,010",
+  //       kesalahan: "+0.3498",
+  //       status: "lolos",
+  //     },
+  //     {
+  //       volNominal: "20",
+  //       penunjukan: "20,040",
+  //       volSebenarnya: "19,990",
+  //       kesalahan: "+0.2501",
+  //       status: "lolos",
+  //     },
+  //   ]);
+  // };
+
+  // ─── State Modal & Validasi ───
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // ─── Cek Kelengkapan Data ───
+  const isDataNozzleFilled = Boolean(
+    dataNozzle.identitas.trim() &&
+    dataNozzle.jenisCairan.trim() &&
+    dataNozzle.hargaSatuan.trim()
+  );
+
+  const isDataBejanaFilled = Boolean(
+    dataBejana.merek.trim() &&
+    dataBejana.tipe.trim() &&
+    dataBejana.nomorSeri.trim() &&
+    dataBejana.volNominal.trim() &&
+    dataBejana.volSebenarnya.trim() &&
+    dataBejana.skalaUtama.trim() &&
+    dataBejana.tglVerifikasi.trim()
+  );
+
+  const isTotalisatorFilled = Boolean(
+    totalisator.sebelumUji.trim() && totalisator.sesudahUji.trim()
+  );
+
+  const isCerapanFilled = cerapan.every(
+    (item) =>
+      item.volNominal.trim() &&
+      item.penunjukan.trim() &&
+      item.volSebenarnya.trim()
+  );
+
+  const isFormValid =
+    isDataNozzleFilled &&
+    isDataBejanaFilled &&
+    isTotalisatorFilled &&
+    isCerapanFilled;
+
+  // ─── Handlers ───
+  const handleValidate = () => {
+    setIsSubmitted(true);
+    if (!isFormValid) return;
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirm = () => {
+    setIsConfirmOpen(false);
+    handleSubmit();
+  };
+
+  const handleSubmit = () => {
+    const step2Payload: Step2Data = {
+      dataNozzle,
+      dataBejana,
+      totalisator,
+      cerapan,
+    };
+    if (updateFormData) {
+      updateFormData("step2", step2Payload);
+    }
+    if (nextStep) {
+      nextStep();
+    } else {
+      router.push("/e-cerapan/hasilpengujian");
+    }
 <<<<<<< HEAD
   // Data Dummy untuk Testing
 
@@ -396,6 +510,8 @@ export default function PengujianPerhitunganPage({
             description="Pompa Ukur BBM — Input data pengujian dan cerapan"
             className="mb-0"
           />
+          {/* Tombol Data Dummy untuk Testing */}
+          {/* <Button
 <<<<<<< HEAD
           {/* Tombol Data Dummy untuk Testing */}
           {/* <Button
@@ -409,6 +525,7 @@ export default function PengujianPerhitunganPage({
             title="Isi otomatis data testing untuk memudahkan pengujian"
           >
             ⚡ Isi Cepat (Testing)
+          </Button> */}
 <<<<<<< HEAD
           </Button> */}
 =======
@@ -772,6 +889,11 @@ export default function PengujianPerhitunganPage({
           </div>
         </FormCard>
 
+        {/* ═══ Feedback Warning jika belum lengkap saat submit ═══ */}
+        {isSubmitted && !isFormValid && (
+          <FormWarning message="Lengkapi seluruh field wajib (*) pada Data Nozzle, Bejana, Totalisator, dan Cerapan sebelum melanjutkan." />
+        )}
+
 <<<<<<< HEAD
         {/* ═══ Feedback Warning jika belum lengkap saat submit ═══ */}
         {isSubmitted && !isFormValid && (
@@ -801,6 +923,7 @@ export default function PengujianPerhitunganPage({
             variant="primary"
             size="lg"
             className="w-full sm:w-1/2"
+            onClick={handleValidate}
 <<<<<<< HEAD
             onClick={handleValidate}
 =======
@@ -825,6 +948,46 @@ export default function PengujianPerhitunganPage({
             Lihat Hasil Evaluasi
           </Button>
         </div>
+
+        <ConfirmModal
+          open={isConfirmOpen}
+          onClose={() => setIsConfirmOpen(false)}
+          onConfirm={handleConfirm}
+          title="Konfirmasi Pengujian & Perhitungan"
+          description="Pastikan seluruh data pengujian nozzle, bejana, dan cerapan telah diinput dengan benar."
+          confirmText="Konfirmasi"
+          cancelText="Batal"
+        >
+          <div className="space-y-3 border-y border-gray-200 py-4">
+            <div className="flex justify-between gap-4 text-sm">
+              <span className="text-neutral">Identitas Nozzle</span>
+              <span className="text-right font-medium text-black">
+                {dataNozzle.identitas || "-"} ({dataNozzle.jenisCairan || "-"})
+              </span>
+            </div>
+
+            <div className="flex justify-between gap-4 text-sm">
+              <span className="text-neutral">Bejana Ukur</span>
+              <span className="text-right font-medium text-black">
+                {dataBejana.merek || "-"} {dataBejana.tipe || "-"}
+              </span>
+            </div>
+
+            <div className="flex justify-between gap-4 text-sm">
+              <span className="text-neutral">Totalisator Terpakai</span>
+              <span className="text-right font-medium text-black">
+                {totalisator.totalTerpakai || "-"}
+              </span>
+            </div>
+
+            <div className="flex justify-between gap-4 text-sm">
+              <span className="text-neutral">Kesalahan Rata-rata</span>
+              <span className="text-right font-medium text-black">
+                {averageErrorStr} ({averageErrorStatus || "—"})
+              </span>
+            </div>
+          </div>
+        </ConfirmModal>
 
         <ConfirmModal
           open={isConfirmOpen}
