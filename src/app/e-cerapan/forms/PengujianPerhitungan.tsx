@@ -14,13 +14,6 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import ConfirmModal from "@/components/e-cerapan/feedback/ConfirmModal";
 import FormWarning from "@/components/e-cerapan/feedback/FormWarning";
-import FormCard from "@/components/e-cerapan/form/FormCard";
-import FormField from "@/components/e-cerapan/form/FormField";
-import SummaryCard from "@/components/e-cerapan/cards/SummaryCard";
-import Card from "@/components/ui/Card";
-import Input from "@/components/ui/Input";
-import Button from "@/components/ui/Button";
-import Badge from "@/components/ui/Badge";
 import {
   WizardStepProps,
   Step2Data,
@@ -260,51 +253,6 @@ export default function PengujianPerhitunganPage({
     repeatabilityStatus = repeatabilityVal <= 0.3 ? "LOLOS" : "TIDAK LOLOS";
   }
 
-  const fillDummyData = () => {
-    setDataNozzle({
-      identitas: "Nozzle 1",
-      jenisCairan: "Pertalite (RON 90)",
-      hargaSatuan: "10000",
-    });
-    setDataBejana({
-      merek: "Pertamina Calibration",
-      tipe: "BU-20L",
-      nomorSeri: "BJ-2023-0012",
-      volNominal: "20",
-      volSebenarnya: "19.998",
-      skalaUtama: "0.05",
-      tglVerifikasi: "2023-12-22",
-    });
-    setTotalisator({
-      sebelumUji: "15432,000",
-      sesudahUji: "15492,000",
-      totalTerpakai: "60.000 L",
-    });
-    setCerapan([
-      {
-        volNominal: "20",
-        penunjukan: "20,050",
-        volSebenarnya: "19,980",
-        kesalahan: "+0.3504",
-        status: "lolos",
-      },
-      {
-        volNominal: "20",
-        penunjukan: "20,080",
-        volSebenarnya: "20,010",
-        kesalahan: "+0.3498",
-        status: "lolos",
-      },
-      {
-        volNominal: "20",
-        penunjukan: "20,040",
-        volSebenarnya: "19,990",
-        kesalahan: "+0.2501",
-        status: "lolos",
-      },
-    ]);
-  };
-
   // Data Dummy untuk Testing
 
   // const fillDummyData = () => {
@@ -438,6 +386,7 @@ export default function PengujianPerhitunganPage({
           />
           {/* Tombol Data Dummy untuk Testing */}
           {/* <Button
+<<<<<<< HEAD
             variant="outline"
             size="sm"
             onClick={fillDummyData}
@@ -461,7 +410,8 @@ export default function PengujianPerhitunganPage({
             description="Pompa Ukur BBM — Input data pengujian dan cerapan"
             className="mb-0"
           />
-          <Button
+          {/* Tombol Data Dummy untuk Testing */}
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={fillDummyData}
@@ -469,7 +419,7 @@ export default function PengujianPerhitunganPage({
             title="Isi otomatis data testing untuk memudahkan pengujian"
           >
             ⚡ Isi Cepat (Testing)
-          </Button>
+          </Button> */}
         </div>
 
         {/* ═══ SECTION 1: Data Pengujian (Readonly from Step 1) ═══ */}
@@ -940,14 +890,12 @@ export default function PengujianPerhitunganPage({
             />
           </div>
         </FormCard>
-        </FormCard>
 
         {/* ═══ Feedback Warning jika belum lengkap saat submit ═══ */}
         {isSubmitted && !isFormValid && (
           <FormWarning message="Lengkapi seluruh field wajib (*) pada Data Nozzle, Bejana, Totalisator, dan Cerapan sebelum melanjutkan." />
         )}
 
-        {/* ═══ Action Buttons ═══ */}
         {/* ═══ Action Buttons ═══ */}
         <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
           <Button
@@ -974,28 +922,14 @@ export default function PengujianPerhitunganPage({
             size="lg"
             className="w-full sm:w-1/2"
             onClick={handleValidate}
+<<<<<<< HEAD
           </Button>
 
           <Button
             variant="primary"
             size="lg"
             className="w-full sm:w-1/2"
-            onClick={() => {
-              const step2Payload: Step2Data = {
-                dataNozzle,
-                dataBejana,
-                totalisator,
-                cerapan,
-              };
-              if (updateFormData) {
-                updateFormData("step2", step2Payload);
-              }
-              if (nextStep) {
-                nextStep();
-              } else {
-                router.push("/e-cerapan/hasilpengujian");
-              }
-            }}
+            onClick={handleValidate}
           >
             Lihat Hasil Evaluasi
           </Button>
