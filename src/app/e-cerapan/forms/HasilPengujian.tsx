@@ -7,12 +7,12 @@ import autoTable from "jspdf-autotable";
 
 import Breadcrumb from "@/components/e-cerapan/layout/Breadcrumb";
 import Stepper from "@/components/e-cerapan/layout/Stepper";
-import PageHeader from "@/components/e-cerapan/layout/PageHeader";
-import ResultCard from "@/components/e-cerapan/ui/ResultCard";
-import MetricSummary from "@/components/e-cerapan/ui/MetricSummary";
-import InfoCard from "@/components/e-cerapan/ui/InfoCard";
-import ParameterTable from "@/components/e-cerapan/ui/ParameterTable";
-import ConfirmationModal from "@/components/e-cerapan/ui/ConfirmationModal";
+import PageHeader from "@/components/e-cerapan/ui/PageHeader";
+import ResultCard from "@/components/e-cerapan/cards/ResultCard";
+import MetricSummary from "@/components/e-cerapan/cards/MetricSummary";
+import InfoCard from "@/components/e-cerapan/cards/InfoCard";
+import ParameterTable from "@/components/e-cerapan/table/ParameterTable";
+import ConfirmationModal from "@/components/e-cerapan/modal/ConfirmationModal";
 import { WizardStepProps } from "@/types/wizard";
 import StatCard from "@/components/e-cerapan/cards/StatCard";
 
