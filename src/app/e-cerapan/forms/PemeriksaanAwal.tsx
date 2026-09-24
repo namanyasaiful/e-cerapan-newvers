@@ -26,7 +26,6 @@ interface DataPengujian {
   nomorOrder: string;
   namaPemilik: string;
   noSPBU: string;
-  noSPBU: string;
   contactPerson: string;
   alamatTerpasang: string;
   namaPompaUkur: string;
@@ -95,7 +94,6 @@ export default function PemeriksaanAwalPage({
   const [formDataState, setFormDataState] = useState<DataPengujian>(() => ({
     nomorOrder: formData?.step1?.dataPengujian?.nomorOrder || "",
     namaPemilik: formData?.step1?.dataPengujian?.namaPemilik || "",
-    noSPBU: formData?.step1?.dataPengujian?.noSPBU || "",
     noSPBU: formData?.step1?.dataPengujian?.noSPBU || "",
     contactPerson: formData?.step1?.dataPengujian?.contactPerson || "",
     alamatTerpasang: formData?.step1?.dataPengujian?.alamatTerpasang || "",
@@ -168,11 +166,6 @@ export default function PemeriksaanAwalPage({
     Boolean(formDataState.nomorOrder.trim()) &&
     Boolean(formDataState.namaPemilik.trim()) &&
     Boolean(formDataState.noSPBU.trim()) &&
-<<<<<<< HEAD
-    Boolean(formDataState.noSPBU.trim()) &&
-=======
-    Boolean(formDataState.nomorSIML.trim()) &&
->>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
     Boolean(formDataState.contactPerson.trim()) &&
     Boolean(formDataState.alamatTerpasang.trim()) &&
     Boolean(formDataState.namaPompaUkur.trim()) &&
@@ -275,75 +268,6 @@ export default function PemeriksaanAwalPage({
   //     }))
   //   );
   // };
-<<<<<<< HEAD
-  // Data Dummy untuk Testing
-
-  // const fillDummyData = () => {
-  //   setFormDataState({
-  //     nomorOrder: "ORD-2024-0847",
-  //     namaPemilik: "PT. Pertamina Retail",
-  //     noSPBU: "SIML-98421",
-  //     contactPerson: "Budi Santoso, 081234567890",
-  //     alamatTerpasang: "Jl. Pemuda No. 45, Jakarta",
-  //     namaPompaUkur: "PU-001",
-  //     tanggalPengujian: "2024-03-20",
-  //     namaPetugas1: "Ahmad Dahlan",
-  //     namaPetugas2: "Rudi Hartono",
-  //   });
-  //   setIdentitasUTTP({
-  //     merek: "Tokheim",
-  //     tipeModel: "Quantium 310",
-  //     nomorSeri: "SN-2023-TKH-0456",
-  //     jumlahNozzle: "2",
-  //     tahunPembuatan: "2022",
-  //   });
-  //   setKondisiOperasi({
-  //     ujiAlkMaksimum: "50",
-  //     ujiAlkMinimum: "5",
-  //     mfr: "2",
-  //     nomorPencacahTipe: "P1-X-Style-V2022",
-  //   });
-  //   setChecklist(
-  //     CHECKLIST_QUESTIONS.map(() => ({
-  //       penilaian: "ya",
-  //       keterangan: "Kondisi baik",
-  //     }))
-  //   );
-  // };
-
-=======
-  const fillDummyData = () => {
-    setFormDataState({
-      nomorOrder: "ORD-2024-0847",
-      namaPemilik: "PT. Pertamina Retail",
-      nomorSIML: "SIML-98421",
-      contactPerson: "Budi Santoso, 081234567890",
-      alamatTerpasang: "Jl. Pemuda No. 45, Jakarta",
-      namaPompaUkur: "PU-001",
-      tanggalPengujian: "2024-03-20",
-      namaPetugas1: "Ahmad Dahlan",
-      namaPetugas2: "Rudi Hartono",
-    });
-    setIdentitasUTTP({
-      merek: "Tokheim",
-      tipeModel: "Quantium 310",
-      nomorSeri: "SN-2023-TKH-0456",
-      jumlahNozzle: "2",
-      tahunPembuatan: "2022",
-    });
-    setKondisiOperasi({
-      ujiAlkMaksimum: "50",
-      ujiAlkMinimum: "5",
-      mfr: "2",
-      nomorPencacahTipe: "P1-X-Style-V2022",
-    });
-    setChecklist(
-      CHECKLIST_QUESTIONS.map(() => ({
-        penilaian: "ya",
-        keterangan: "Kondisi baik",
-      }))
-    );
-  };
 
 >>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
   return (
@@ -351,7 +275,6 @@ export default function PemeriksaanAwalPage({
       <div className="px-8 py-8 md:px-12 md:py-12 max-w-[1100px] mx-auto space-y-8 pb-16">
         {/* Stepper */}
         <Stepper
-          steps={["Pemeriksaan Awal", "Pengujian & Pemeriksaan", "Hasil"]}
           steps={["Pemeriksaan Awal", "Pengujian & Pemeriksaan", "Hasil"]}
           currentStep={0}
         />
@@ -365,12 +288,6 @@ export default function PemeriksaanAwalPage({
           />
           {/* Tombol Data Dummy untuk Testing */}
           {/* <Button
-<<<<<<< HEAD
-          {/* Tombol Data Dummy untuk Testing */}
-          {/* <Button
-=======
-          <Button
->>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
             variant="outline"
             size="sm"
             onClick={fillDummyData}
@@ -379,13 +296,6 @@ export default function PemeriksaanAwalPage({
           >
             Isi Cepat (Testing)
           </Button> */}
-<<<<<<< HEAD
-            Isi Cepat (Testing)
-          </Button> */}
-=======
-            ⚡ Isi Cepat (Testing)
-          </Button>
->>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
         </div>
 
         {/* ═══ SECTION 1: Data Pengujian ═══ */}
@@ -430,24 +340,13 @@ export default function PemeriksaanAwalPage({
               />
             </FormField>
 
-<<<<<<< HEAD
             <FormField
+              label="Nomor SPBU"
               label="Nomor SPBU"
               required
               error={
                 isSubmitted && !formDataState.noSPBU.trim()
                   ? "Nomor SPBU wajib diisi."
-=======
-            {/* NOMOR SIML */}
-            <FormField
-              label="Nomor SPBU"
-              required
-              error={
-                isSubmitted && !formDataState.noSPBU.trim()
-                  ? "Nomor SPBU wajib diisi."
-                isSubmitted && !formDataState.nomorSIML.trim()
-                  ? "Nomor SIML wajib diisi."
->>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
                   : undefined
               }
             >
@@ -455,13 +354,6 @@ export default function PemeriksaanAwalPage({
                 placeholder="cth. 01234"
                 value={formDataState.noSPBU}
                 onChange={(e) => updateDataPengujian("noSPBU", e.target.value)}
-<<<<<<< HEAD
-                value={formDataState.noSPBU}
-                onChange={(e) => updateDataPengujian("noSPBU", e.target.value)}
-=======
-                value={formDataState.nomorSIML}
-                onChange={(e) => updateDataPengujian("nomorSIML", e.target.value)}
->>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
               />
             </FormField>
 
@@ -778,35 +670,7 @@ export default function PemeriksaanAwalPage({
                   </TableHeader>
                 </TableRow>
               </TableHead>
-<<<<<<< HEAD
-          <div className="w-full overflow-x-auto">
-            <Table className="min-w-[760px] table-fixed text-xs">
-              {/* TABLE HEADER */}
-              <TableHead>
-                <TableRow>
-                  <TableHeader className="w-[6%] px-3 py-3 text-center">
-                    No
-                  </TableHeader>
-                  <TableHeader className="w-[49%] px-3 py-3 text-left">
-                    Deskripsi
-                  </TableHeader>
-                  <TableHeader className="w-[22%] px-3 py-3 text-center">
-                    Penilaian
-                  </TableHeader>
-                  <TableHeader className="w-[23%] px-3 py-3 text-left">
-                    Keterangan <span className="text-neutral">*opsional</span>
-                  </TableHeader>
-                </TableRow>
-              </TableHead>
 
-              {/* TABLE BODY */}
-              <TableBody>
-                {CHECKLIST_QUESTIONS.map((question, index) => (
-                  <TableRow key={index}>
-                    {/* NOMOR */}
-                    <TableCell className="px-3 py-3 text-center align-middle">
-                      {index + 1}
-                    </TableCell>
               {/* TABLE BODY */}
               <TableBody>
                 {CHECKLIST_QUESTIONS.map((question, index) => (
@@ -820,31 +684,7 @@ export default function PemeriksaanAwalPage({
                     <TableCell className="whitespace-pre-line px-3 py-3 align-middle leading-[1.35]">
                       {question}
                     </TableCell>
-                    {/* DESKRIPSI */}
-                    <TableCell className="whitespace-pre-line px-3 py-3 align-middle leading-[1.35]">
-                      {question}
-                    </TableCell>
 
-                    {/* PENILAIAN */}
-                    <TableCell className="px-2 py-3 align-middle">
-                      <RadioGroup
-                        name={`penilaian-${index}`}
-                        value={checklist[index].penilaian ?? ""}
-                        onChange={(value) =>
-                          updateChecklist(
-                            index,
-                            "penilaian",
-                            value as "ya" | "tidak",
-                          )
-                        }
-                        options={[
-                          { label: "Ya", value: "ya" },
-                          { label: "Tidak", value: "tidak" },
-                        ]}
-                        className="justify-center gap-3"
-                        inputClassName="h-3.5 w-3.5"
-                      />
-                    </TableCell>
                     {/* PENILAIAN */}
                     <TableCell className="px-2 py-3 align-middle">
                       <RadioGroup
@@ -884,97 +724,6 @@ export default function PemeriksaanAwalPage({
             </Table>
           </div>
 
-                    {/* KETERANGAN */}
-                    <TableCell className="px-3 py-3 align-middle">
-                      <Textarea
-                        placeholder="Masukkan Keterangan"
-                        rows={1}
-                        value={checklist[index].keterangan}
-                        onChange={(e) =>
-                          updateChecklist(index, "keterangan", e.target.value)
-                        }
-                        className="min-h-[34px] resize-y px-2 py-2 text-[10px]"
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-
-=======
-          <Table className="min-w-[760px] table-fixed text-xs">
-            {/* TABLE HEADER */}
-            <TableHead>
-              <TableRow>
-                <TableHeader className="w-[6%] px-3 py-3 text-center">
-                  No
-                </TableHeader>
-                <TableHeader className="w-[49%] px-3 py-3 text-left">
-                  Deskripsi
-                </TableHeader>
-                <TableHeader className="w-[22%] px-3 py-3 text-center">
-                  Penilaian
-                </TableHeader>
-                <TableHeader className="w-[23%] px-3 py-3 text-left">
-                  Keterangan <span className="text-neutral">*opsional</span>
-                </TableHeader>
-              </TableRow>
-            </TableHead>
-
-            {/* TABLE BODY */}
-            <TableBody>
-              {CHECKLIST_QUESTIONS.map((question, index) => (
-                <TableRow key={index}>
-                  {/* NOMOR */}
-                  <TableCell className="px-3 py-3 text-center align-middle">
-                    {index + 1}
-                  </TableCell>
-
-                  {/* DESKRIPSI */}
-                  <TableCell className="whitespace-pre-line px-3 py-3 align-middle leading-[1.35]">
-                    {question}
-                  </TableCell>
-
-                  {/* PENILAIAN */}
-                  <TableCell className="px-2 py-3 align-middle">
-                    <RadioGroup
-                      name={`penilaian-${index}`}
-                      value={checklist[index].penilaian ?? ""}
-                      onChange={(value) =>
-                        updateChecklist(
-                          index,
-                          "penilaian",
-                          value as "ya" | "tidak",
-                        )
-                      }
-                      options={[
-                        { label: "Ya", value: "ya" },
-                        { label: "Tidak", value: "tidak" },
-                      ]}
-                      className="justify-center gap-3"
-                      inputClassName="h-3.5 w-3.5"
-                    />
-                  </TableCell>
-
-                  {/* KETERANGAN */}
-                  <TableCell className="px-3 py-3 align-middle">
-                    <Textarea
-                      placeholder="Masukkan Keterangan"
-                      rows={1}
-                      value={checklist[index].keterangan}
-                      onChange={(e) =>
-                        updateChecklist(index, "keterangan", e.target.value)
-                      }
-                      className="min-h-[34px] resize-y px-2 py-2 text-[10px]"
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
->>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
           {/* Warning Feedback Component */}
           {!isFormValid && (
             <div className="px-5 pb-5 pt-4">
@@ -998,12 +747,6 @@ export default function PemeriksaanAwalPage({
           </Button>
         </div>
 
-<<<<<<< HEAD
-=======
-        {/* ================================================
-            CONFIRM MODAL
-        ================================================ */}
->>>>>>> 71c9bb6 (apply atomic design and fix HasilPemeriksaanAwal, PemeriksaanAwal, PengujianPerhitungan, page e-cerapan (belum semua selesai, cek aja dulu))
         <ConfirmModal
           open={isConfirmOpen}
           onClose={() => setIsConfirmOpen(false)}
