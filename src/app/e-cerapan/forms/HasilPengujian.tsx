@@ -74,7 +74,7 @@ export default function HasilPengujianPage({
       const lineHeight = 4.4;
 
       const dataForm = formData?.step1?.dataPengujian;
-      const nomorSurat = dataForm?.nomorSIML || "P.5617/PKTN.4.5/DL/07/2025";
+      const nomorSurat = dataForm?.noSPBU || "P.5617/PKTN.4.5/DL/07/2025";
       const nomorDokumenAtas = "DL-P-25-0095-001";
 
       // halaman 1
