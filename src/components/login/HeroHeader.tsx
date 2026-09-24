@@ -17,7 +17,7 @@ export default function HeroHeader({
 }: HeroHeaderProps) {
   return (
     <div className="flex flex-col">
-      <div>
+      <div className="mb-3">
         <Image src={logoSrc} alt="Logo Metrologi" width={70} height={70} />
       </div>
 
