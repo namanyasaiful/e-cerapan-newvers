@@ -32,26 +32,26 @@ export default function InfoCard({
 }: InfoCardProps = {}) {
 
   return (
-    <div className="grid grid-cols-2 gap-6">
-      <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm">
-        <h3 className="font-bold text-[#2479BC] text-base mb-4">Identitas Alat</h3>
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
+      <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm lg:p-6">
+        <h3 className="mb-4 text-base font-bold text-[#2479BC]">Identitas Alat</h3>
         <div className="flex flex-col divide-y divide-slate-100 text-xs">
           {identitasAlat.map((item, idx) => (
-            <div key={idx} className="flex justify-between py-2">
+            <div key={idx} className="flex flex-col gap-1 py-2 lg:flex-row lg:items-center lg:justify-between lg:gap-0">
               <span className="text-slate-500">{item.label}</span>
-              <span className="font-semibold text-slate-800">{item.value}</span>
+              <span className="break-words font-semibold text-slate-800 lg:text-right">{item.value}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm">
-        <h3 className="font-bold text-[#2479BC] text-base mb-4">Data Pengujian</h3>
+      <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm lg:p-6">
+        <h3 className="mb-4 text-base font-bold text-[#2479BC]">Data Pengujian</h3>
         <div className="flex flex-col divide-y divide-slate-100 text-xs">
           {dataPengujian.map((item, idx) => (
-            <div key={idx} className="flex justify-between py-2">
+            <div key={idx} className="flex flex-col gap-1 py-2 lg:flex-row lg:items-center lg:justify-between lg:gap-0">
               <span className="text-slate-500">{item.label}</span>
-              <span className="font-semibold text-slate-800">{item.value}</span>
+              <span className="break-words font-semibold text-slate-800 lg:text-right">{item.value}</span>
             </div>
           ))}
         </div>

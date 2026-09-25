@@ -35,7 +35,45 @@ export default function ParameterTable({ data = DEFAULT_PARAMETER_DATA }: Parame
         <h3 className="font-semibold text-black text-sm">Tabel Evaluasi Parameter</h3>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="divide-y divide-slate-100 lg:hidden">
+        {data.map((row, index) => (
+          <div key={row.id || index} className="p-4 text-xs">
+            <div className="mb-3 font-semibold leading-relaxed text-[#2479BC]">
+              {row.parameter}
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-slate-500">
+              <div>
+                <div className="mb-1 text-[10px] uppercase tracking-wide">Nilai</div>
+                <div className="font-medium text-black">{row.nilai}</div>
+              </div>
+              <div>
+                <div className="mb-1 text-[10px] uppercase tracking-wide">Satuan</div>
+                <div className="text-slate-700">{row.satuan}</div>
+              </div>
+              <div>
+                <div className="mb-1 text-[10px] uppercase tracking-wide">Batas/Toleransi</div>
+                <div className="break-words text-slate-700">{row.toleransi}</div>
+              </div>
+              <div>
+                <div className="mb-1 text-[10px] uppercase tracking-wide">Status</div>
+                {row.status === "LOLOS" ? (
+                  <span className="inline-block rounded-full border border-[#64CC4A] bg-[#F0FAED] px-3 py-1 text-[10px] font-semibold text-[#64CC4A]">
+                    LOLOS
+                  </span>
+                ) : row.status === "GAGAL" ? (
+                  <span className="inline-block rounded-full border border-red-500 bg-red-50 px-3 py-1 text-[10px] font-semibold text-red-500">
+                    GAGAL
+                  </span>
+                ) : (
+                  <span className="text-slate-700">—</span>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="hidden overflow-x-auto lg:block">
         <table className="w-full text-xs text-left border-collapse">
           <thead>
             <tr className="border-b border-slate-100 text-[#2479BC]">

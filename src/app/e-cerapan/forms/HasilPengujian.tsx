@@ -7,13 +7,14 @@ import autoTable from "jspdf-autotable";
 
 import Breadcrumb from "@/components/e-cerapan/layout/Breadcrumb";
 import Stepper from "@/components/e-cerapan/layout/Stepper";
-import PageHeader from "@/components/e-cerapan/ui/PageHeader";
-import ResultCard from "@/components/e-cerapan/ui/ResultCard";
-import MetricSummary from "@/components/e-cerapan/ui/MetricSummary";
-import InfoCard from "@/components/e-cerapan/ui/InfoCard";
-import ParameterTable from "@/components/e-cerapan/ui/ParameterTable";
-import ConfirmationModal from "@/components/e-cerapan/ui/ConfirmationModal";
+import PageHeader from "@/components/e-cerapan/layout/PageHeader";
+import ResultCard from "@/components/e-cerapan/cards/ResultCard";
+import MetricSummary from "@/components/e-cerapan/cards/MetricSummary";
+import InfoCard from "@/components/e-cerapan/cards/InfoCard";
+import ParameterTable from "@/components/e-cerapan/table/ParameterTable";
+import ConfirmationModal from "@/components/e-cerapan/modal/ConfirmationModal";
 import { WizardStepProps } from "@/types/wizard";
+import StatCard from "@/components/e-cerapan/cards/StatCard";
 
 export default function HasilPengujianPage({
   formData,
@@ -24,6 +25,7 @@ export default function HasilPengujianPage({
   const router = useRouter();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (!updateFormData) {
       router.replace("/e-cerapan");
     }
@@ -63,7 +65,7 @@ export default function HasilPengujianPage({
       const lineHeight = 4.4;
 
       const dataForm = formData?.step1?.dataPengujian;
-      const nomorSurat = dataForm?.nomorSIML || "P.5617/PKTN.4.5/DL/07/2025";
+      const nomorSurat = dataForm?.noSPBU || "P.5617/PKTN.4.5/DL/07/2025";
       const nomorDokumenAtas = "DL-P-25-0095-001";
 
       // halaman 1
@@ -321,11 +323,11 @@ export default function HasilPengujianPage({
         .then((blob) =>
           blob
             ? new Promise<string | null>((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result as string);
-                reader.onerror = () => resolve(null);
-                reader.readAsDataURL(blob);
-              })
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result as string);
+              reader.onerror = () => resolve(null);
+              reader.readAsDataURL(blob);
+            })
             : null,
         )
         .catch(() => null);
@@ -517,6 +519,7 @@ export default function HasilPengujianPage({
 
   return (
     <div className="min-h-screen bg-[#F9F9F9] w-full">
+
       <div className="px-8 py-8 md:px-12 md:py-12 max-w-[1100px] mx-auto">
         <Stepper
           steps={["Pemeriksaan Awal", "Pengujian/Pemeriksaan", "Hasil"]}
@@ -525,7 +528,7 @@ export default function HasilPengujianPage({
         <div className="flex flex-col gap-[40px]">
           <PageHeader
             title="Hasil Keseluruhan Pengujian"
-            subtitle="Evaluasi lengkap semua parameter pengujian Pompa Ukur BBM"
+            description="Evaluasi lengkap semua parameter pengujian Pompa Ukur BBM"
           />
 
           <ResultCard isSuccess={displayIsSuccess} />
