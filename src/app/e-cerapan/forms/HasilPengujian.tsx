@@ -7,7 +7,6 @@ import autoTable from "jspdf-autotable";
 
 import Breadcrumb from "@/components/e-cerapan/layout/Breadcrumb";
 import Stepper from "@/components/e-cerapan/layout/Stepper";
-import PageHeader from "@/components/e-cerapan/layout/PageHeader";
 import ResultCard from "@/components/e-cerapan/cards/ResultCard";
 import MetricSummary from "@/components/e-cerapan/cards/MetricSummary";
 import InfoCard from "@/components/e-cerapan/cards/InfoCard";
