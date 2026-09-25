@@ -7,6 +7,7 @@ import autoTable from "jspdf-autotable";
 
 import Breadcrumb from "@/components/e-cerapan/layout/Breadcrumb";
 import Stepper from "@/components/e-cerapan/layout/Stepper";
+
 import PageHeader from "@/components/e-cerapan/ui/PageHeader";
 import ResultCard from "@/components/e-cerapan/cards/ResultCard";
 import MetricSummary from "@/components/e-cerapan/cards/MetricSummary";
@@ -25,6 +26,7 @@ export default function HasilPengujianPage({
   const router = useRouter();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (!updateFormData) {
       router.replace("/e-cerapan");
     }
@@ -64,7 +66,7 @@ export default function HasilPengujianPage({
       const lineHeight = 4.4;
 
       const dataForm = formData?.step1?.dataPengujian;
-      const nomorSurat = dataForm?.nomorSIML || "P.5617/PKTN.4.5/DL/07/2025";
+      const nomorSurat = dataForm?.noSPBU || "P.5617/PKTN.4.5/DL/07/2025";
       const nomorDokumenAtas = "DL-P-25-0095-001";
 
       // halaman 1
@@ -322,11 +324,11 @@ export default function HasilPengujianPage({
         .then((blob) =>
           blob
             ? new Promise<string | null>((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result as string);
-                reader.onerror = () => resolve(null);
-                reader.readAsDataURL(blob);
-              })
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result as string);
+              reader.onerror = () => resolve(null);
+              reader.readAsDataURL(blob);
+            })
             : null,
         )
         .catch(() => null);
@@ -527,7 +529,7 @@ export default function HasilPengujianPage({
         <div className="flex flex-col gap-[40px]">
           <PageHeader
             title="Hasil Keseluruhan Pengujian"
-            subtitle="Evaluasi lengkap semua parameter pengujian Pompa Ukur BBM"
+            description="Evaluasi lengkap semua parameter pengujian Pompa Ukur BBM"
           />
 
           <ResultCard isSuccess={displayIsSuccess} />
