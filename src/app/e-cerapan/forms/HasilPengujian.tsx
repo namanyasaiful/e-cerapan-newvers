@@ -545,7 +545,7 @@ export default function HasilPengujianPage({
 
   return (
     <div className="min-h-screen bg-[#F9F9F9] w-full">
-      
+
       <div className="px-8 py-8 md:px-12 md:py-12 max-w-[1100px] mx-auto">
         <Stepper
           steps={["Pemeriksaan Awal", "Pengujian/Pemeriksaan", "Hasil"]}
