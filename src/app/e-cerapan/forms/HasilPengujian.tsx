@@ -7,20 +7,12 @@ import autoTable from "jspdf-autotable";
 
 import PageHeader from "@/components/e-cerapan/layout/PageHeader";
 import Stepper from "@/components/e-cerapan/layout/Stepper";
-import PageHeader from "@/components/e-cerapan/ui/PageHeader";
 import ResultCard from "@/components/e-cerapan/cards/ResultCard";
 import MetricSummary from "@/components/e-cerapan/cards/MetricSummary";
 import InfoCard from "@/components/e-cerapan/cards/InfoCard";
 import ParameterTable from "@/components/e-cerapan/table/ParameterTable";
 import ConfirmationModal from "@/components/e-cerapan/modal/ConfirmationModal";
 import { WizardStepProps } from "@/types/wizard";
-import StatCard from "@/components/e-cerapan/cards/StatCard";
-import ResultCard from "@/components/e-cerapan/cards/ResultCard";
-import MetricSummary from "@/components/e-cerapan/cards/MetricSummary";
-import InfoCard from "@/components/e-cerapan/cards/InfoCard";
-import ParameterTable from "@/components/e-cerapan/table/ParameterTable";
-import ConfirmationModal from "@/components/e-cerapan/modal/ConfirmationModal";
-import type { WizardStepProps } from "@/types/wizard";
 
 export default function HasilPengujianPage({
   formData,
@@ -270,7 +262,9 @@ export default function HasilPengujianPage({
         },
       });
 
-      const finalTableY = pdf.lastAutoTable?.finalY || 120;
+      const finalTableY =
+        (pdf as jsPDF & { lastAutoTable?: { finalY: number } }).lastAutoTable
+          ?.finalY || 120;
       y = finalTableY + 8;
 
       pdf.setFont("helvetica", "normal");
