@@ -21,10 +21,49 @@ export default function RegisterPage() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setErrorMessage("");
+
+    if (formData.password !== formData.confirmPassword) {
+      setErrorMessage("Konfirmasi password tidak cocok");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nama: formData.fullName,
+          email: formData.email,
+          telp: formData.phone,
+          password: formData.password,
+        }),
+      });
+      const result: { message?: string } = await response.json();
+
+      if (!response.ok) {
+        setErrorMessage(result.message ?? "Registrasi gagal. Silakan coba lagi.");
+        return;
+      }
+
+      router.push("/auth/login");
+    } catch {
+      setErrorMessage("Tidak dapat terhubung ke server. Silakan coba lagi.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -45,7 +84,7 @@ export default function RegisterPage() {
             <h2 className="text-3xl font-bold text-black">Register</h2>
           </div>
 
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-1.5">
               <label className="block text-sm font-normal text-black">
                 Nama Lengkap
@@ -55,6 +94,8 @@ export default function RegisterPage() {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
+                autoComplete="name"
+                required
                 placeholder="Masukan Nama"
                 className="rounded-lg px-4 py-2.5"
               />
@@ -69,6 +110,8 @@ export default function RegisterPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                autoComplete="email"
+                required
                 placeholder="Masukan Email"
                 className="rounded-lg px-4 py-2.5"
               />
@@ -83,6 +126,8 @@ export default function RegisterPage() {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
+                autoComplete="tel"
+                required
                 placeholder="Contoh: 08xx-xxxx-xxxx"
                 className="rounded-lg px-4 py-2.5"
               />
@@ -98,6 +143,9 @@ export default function RegisterPage() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
+                  autoComplete="new-password"
+                  minLength={8}
+                  required
                   placeholder="Masukan Password"
                   className="rounded-lg pr-10"
                 />
@@ -121,6 +169,9 @@ export default function RegisterPage() {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
+                  autoComplete="new-password"
+                  minLength={8}
+                  required
                   placeholder="Masukan Password"
                   className="rounded-lg pr-10"
                 />
@@ -140,10 +191,16 @@ export default function RegisterPage() {
                 variant="primary"
                 size="md"
                 fullWidth
+                disabled={isSubmitting}
               >
-                Daftar
+                {isSubmitting ? "Mendaftarkan..." : "Daftar"}
               </Button>
             </div>
+            {errorMessage && (
+              <p className="text-sm text-red-600" role="alert">
+                {errorMessage}
+              </p>
+            )}
           </form>
 
           <p className="mt-4 text-center text-sm text-black">

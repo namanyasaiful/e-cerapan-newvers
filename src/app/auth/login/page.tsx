@@ -1,9 +1,7 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import HeroHeader from "@/components/login/HeroHeader";
 import ChevronButton from "@/components/ui/ChevronButton";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -12,6 +10,36 @@ import Link from "next/link";
 
 export default function Page() {
   const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setErrorMessage("");
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const result: { message?: string } = await response.json();
+
+      if (!response.ok) {
+        setErrorMessage(result.message ?? "Login gagal. Periksa email dan password.");
+        return;
+      }
+
+      router.replace("/e-cerapan");
+    } catch {
+      setErrorMessage("Tidak dapat terhubung ke server. Silakan coba lagi.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <main className="flex min-h-screen w-full">
@@ -31,29 +59,38 @@ export default function Page() {
           </div>
 
           {/* Form Inputs */}
-          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label className="block text-sm  text-black mb-1">
                 Email
               </label>
-              <Input type="email" placeholder="Masukan Email" />
+              <Input
+                type="email"
+                name="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                autoComplete="email"
+                required
+                placeholder="Masukan Email"
+              />
             </div>
 
             <div>
               <label className="block text-sm text-black mb-1">
                 Password
               </label>
-              <Input type="password" placeholder="Masukan Password" />
+              <Input
+                type="password"
+                name="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                autoComplete="current-password"
+                required
+                placeholder="Masukan Password"
+              />
             </div>
 
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center text-black cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2"
-                />
-                Ingat saya
-              </label>
+            <div className="flex justify-end text-sm">
               <Link
                 href="/auth/forgot-password"
                 className="font-medium text-[#5094C9] hover:underline"
@@ -62,9 +99,20 @@ export default function Page() {
               </Link>
             </div>
 
-            <Button type="submit" variant="primary" size="md" fullWidth>
-              Login
+            <Button
+              type="submit"
+              variant="primary"
+              size="md"
+              fullWidth
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Memeriksa..." : "Login"}
             </Button>
+            {errorMessage && (
+              <p className="text-sm text-red-600" role="alert">
+                {errorMessage}
+              </p>
+            )}
           </form>
 
           <p className="mt-6 text-center text-sm text-black">
