@@ -1,0 +1,2 @@
+ALTER TABLE "User"
+ALTER COLUMN "telp" TYPE TEXT USING "telp"::TEXT;
