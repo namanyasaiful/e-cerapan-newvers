@@ -29,7 +29,7 @@ export default function Hero() {
           <span className="text-amber-300">Secara Digital</span>
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-sm text-white md:text-base">
-          E-Cerapan adalah layanan digital dari Direktorat Metrologi dan
+          E-Cerapan adalah suatu layanan digital dari Direktorat Metrologi dan
           Kementerian Perdagangan RI, untuk memastikan keakuratan alat ukur
           sesuai standar yang berlaku. Layanan ini terbuka bagi petugas lapangan
           maupun masyarakat umum.
