@@ -8,6 +8,7 @@ import AuthHeroBanner from "@/components/login/AuthHeroBanner";
 import ChevronButton from "@/components/ui/ChevronButton";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import MessageModal from "@/components/e-cerapan/feedback/MessageModal";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -23,6 +24,7 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -58,7 +60,7 @@ export default function RegisterPage() {
         return;
       }
 
-      router.push("/auth/login");
+      setIsSuccessModalOpen(true);
     } catch {
       setErrorMessage("Tidak dapat terhubung ke server. Silakan coba lagi.");
     } finally {
@@ -210,9 +212,15 @@ export default function RegisterPage() {
             </Link>
           </p>
         </div>
-
-        
       </div>
+      <MessageModal
+        open={isSuccessModalOpen}
+        onClose={() => router.push("/auth/login")}
+        title="Registrasi Berhasil"
+        message="Akun Anda berhasil dibuat. Silakan login untuk melanjutkan."
+        variant="success"
+        buttonText="Ke Halaman Login"
+      />
     </main>
   );
 }

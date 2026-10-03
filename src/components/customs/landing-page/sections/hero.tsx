@@ -36,7 +36,7 @@ export default function Hero() {
         </p>
         <Button
           variant="primary"
-          onPress={() => router.push("/e-cerapan")}
+          onPress={() => router.push("/auth/login")}
           className="h-12 w-full rounded-md mt-4 bg-primary shadow-md px-8 text-base font-semibold text-white sm:w-auto"
         >
           Coba Sekarang

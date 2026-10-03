@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { LayoutPanelLeft, Fuel, type LucideIcon, LogOut } from "lucide-react";
+import ConfirmModal from "@/components/e-cerapan/feedback/ConfirmModal";
+import { AUTH_USER_NAME_STORAGE_KEY } from "@/lib/auth-storage";
 
 const menuItems: {
   label: string;
@@ -24,7 +26,9 @@ const menuItems: {
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
   const isActive = (href: string) => {
     if (href === "/e-cerapan") {
@@ -122,17 +126,32 @@ export default function Sidebar() {
             <div className="mb-6 h-7 border-b border-primary-hover/50" />
 
             {/* Bottom */}
-            <Link
-              href="/"
+            <button
+              type="button"
+              onClick={() => setIsLogoutConfirmOpen(true)}
               className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-danger transition-colors hover:bg-danger-hover"
             >
               <LogOut className="h-[18px] w-[18px]" />
 
               <span>Keluar</span>
-            </Link>
+            </button>
           </nav>
         </div>
       </aside>
+
+      <ConfirmModal
+        open={isLogoutConfirmOpen}
+        onClose={() => setIsLogoutConfirmOpen(false)}
+        onConfirm={() => {
+          setIsLogoutConfirmOpen(false);
+          localStorage.removeItem(AUTH_USER_NAME_STORAGE_KEY);
+          router.push("/");
+        }}
+        title="Konfirmasi Keluar"
+        description="Apakah Anda yakin ingin keluar?"
+        confirmText="Ya, Keluar"
+        cancelText="Batal"
+      />
     </>
   );
 }

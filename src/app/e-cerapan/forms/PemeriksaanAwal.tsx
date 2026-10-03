@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import PageHeader from "@/components/e-cerapan/layout/PageHeader";
 import Stepper from "@/components/e-cerapan/layout/Stepper";
@@ -13,6 +13,11 @@ import RadioGroup from "@/components/ui/RadioGroup";
 import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
 import { WizardStepProps, Step1Data } from "@/types/wizard";
+import {
+  getAuthUserNameSnapshot,
+  getServerAuthUserNameSnapshot,
+  subscribeToAuthUserName,
+} from "@/lib/auth-storage";
 import {
   Table,
   TableHead,
@@ -102,6 +107,14 @@ export default function PemeriksaanAwalPage({
     namaPetugas2: formData?.step1?.dataPengujian?.namaPetugas2 || "",
   }));
 
+  const authenticatedUserName = useSyncExternalStore(
+    subscribeToAuthUserName,
+    getAuthUserNameSnapshot,
+    getServerAuthUserNameSnapshot,
+  );
+  const namaPemilik = authenticatedUserName || formDataState.namaPemilik;
+  const namaPetugas1 = authenticatedUserName || formDataState.namaPetugas1;
+
   const [identitasUTTP, setIdentitasUTTP] = useState<IdentitasUTTP>(() => ({
     merek: formData?.step1?.identitasUTTP?.merek || "",
     tipeModel: formData?.step1?.identitasUTTP?.tipeModel || "",
@@ -163,13 +176,13 @@ export default function PemeriksaanAwalPage({
 
   const isDataPengujianFilled =
     Boolean(formDataState.nomorOrder.trim()) &&
-    Boolean(formDataState.namaPemilik.trim()) &&
+    Boolean(namaPemilik.trim()) &&
     Boolean(formDataState.noSPBU.trim()) &&
     Boolean(formDataState.contactPerson.trim()) &&
     Boolean(formDataState.alamatTerpasang.trim()) &&
     Boolean(formDataState.namaPompaUkur.trim()) &&
     Boolean(formDataState.tanggalPengujian.trim()) &&
-    Boolean(formDataState.namaPetugas1.trim()) &&
+    Boolean(namaPetugas1.trim()) &&
     Boolean(formDataState.namaPetugas2.trim());
 
   const isIdentitasUTTPFilled =
@@ -213,6 +226,8 @@ export default function PemeriksaanAwalPage({
     const payload: Step1Data = {
       dataPengujian: {
         ...formDataState,
+        namaPemilik,
+        namaPetugas1,
         noSPBU: formData?.step1?.dataPengujian?.noSPBU || "",
       },
       identitasUTTP,
@@ -327,15 +342,15 @@ export default function PemeriksaanAwalPage({
               label="Nama Pemilik/Penanggung Jawab"
               required
               error={
-                isSubmitted && !formDataState.namaPemilik.trim()
+                isSubmitted && !namaPemilik.trim()
                   ? "Nama pemilik wajib diisi."
                   : undefined
               }
             >
               <Input
                 placeholder="cth. PT Pertamina Retail"
-                value={formDataState.namaPemilik}
-                onChange={(e) => updateDataPengujian("namaPemilik", e.target.value)}
+                value={namaPemilik}
+                readOnly
               />
             </FormField>
 
@@ -440,15 +455,15 @@ export default function PemeriksaanAwalPage({
               label="Nama Petugas 1"
               required
               error={
-                isSubmitted && !formDataState.namaPetugas1.trim()
+                isSubmitted && !namaPetugas1.trim()
                   ? "Nama petugas 1 wajib diisi."
                   : undefined
               }
             >
               <Input
                 placeholder="cth. Budi Santoso"
-                value={formDataState.namaPetugas1}
-                onChange={(e) => updateDataPengujian("namaPetugas1", e.target.value)}
+                value={namaPetugas1}
+                readOnly
               />
             </FormField>
 
@@ -768,7 +783,7 @@ export default function PemeriksaanAwalPage({
             <div className="flex justify-between gap-4 text-sm">
               <span className="text-neutral">Nama Pemilik</span>
               <span className="text-right font-medium text-black">
-                {formDataState.namaPemilik || "-"}
+                {namaPemilik || "-"}
               </span>
             </div>
 

@@ -7,6 +7,14 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import AuthHeroBanner from "@/components/login/AuthHeroBanner";
 import Link from "next/link";
+import { AUTH_USER_NAME_STORAGE_KEY } from "@/lib/auth-storage";
+
+interface LoginResponse {
+  message?: string;
+  user?: {
+    nama?: string;
+  };
+}
 
 export default function Page() {
   const router = useRouter();
@@ -26,13 +34,19 @@ export default function Page() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const result: { message?: string } = await response.json();
+      const result: LoginResponse = await response.json();
 
       if (!response.ok) {
         setErrorMessage(result.message ?? "Login gagal. Periksa email dan password.");
         return;
       }
 
+      if (!result.user?.nama) {
+        setErrorMessage("Nama akun tidak tersedia. Silakan coba login kembali.");
+        return;
+      }
+
+      localStorage.setItem(AUTH_USER_NAME_STORAGE_KEY, result.user.nama);
       router.replace("/e-cerapan");
     } catch {
       setErrorMessage("Tidak dapat terhubung ke server. Silakan coba lagi.");

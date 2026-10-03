@@ -20,7 +20,7 @@ export default function CtaSection() {
 
         <Button
           variant="primary"
-          onPress={() => router.push("/e-cerapan")}
+          onPress={() => router.push("/auth/login")}
           className="mt-8 rounded-lg bg-warning px-6 py-3 text-sm font-bold text-white transition hover:bg-yellow-500 sm:px-8 md:mt-10 md:px-12 md:py-6 md:text-base"
         >
           Coba Sekarang
