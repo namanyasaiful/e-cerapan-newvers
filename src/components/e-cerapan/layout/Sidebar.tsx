@@ -145,7 +145,7 @@ export default function Sidebar() {
         onConfirm={() => {
           setIsLogoutConfirmOpen(false);
           localStorage.removeItem(AUTH_USER_NAME_STORAGE_KEY);
-          router.push("/");
+          router.replace("/");
         }}
         title="Konfirmasi Keluar"
         description="Apakah Anda yakin ingin keluar?"
