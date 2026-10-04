@@ -59,6 +59,18 @@ interface ChecklistItemState {
   keterangan: string;
 }
 
+const isPositiveNumber = (value: string) =>
+  /^(?:\d+\.?\d*|\.\d+)$/.test(value.trim()) &&
+  Number.isFinite(Number(value)) &&
+  Number(value) > 0;
+
+const isDigitsOnly = (value: string) => /^\d*$/.test(value);
+
+const isPositiveInteger = (value: string) =>
+  /^\d+$/.test(value) &&
+  Number.isSafeInteger(Number(value)) &&
+  Number(value) > 0;
+
 // ─── Checklist Questions ─────────────────────────────────────
 
 const CHECKLIST_QUESTIONS = [
@@ -88,6 +100,7 @@ export default function PemeriksaanAwalPage({
   nextStep,
 }: Partial<WizardStepProps> = {}) {
   const router = useRouter();
+  const currentYear = new Date().getFullYear();
 
   useEffect(() => {
     if (!updateFormData) {
@@ -174,10 +187,21 @@ export default function PemeriksaanAwalPage({
 
   // ─── Check if all mandatory fields and checklist items are filled ───
 
+  const isNoSPBUValid = /^\d+$/.test(formDataState.noSPBU);
+  const isJumlahNozzleValid = isPositiveInteger(identitasUTTP.jumlahNozzle);
+  const isTahunPembuatanValid =
+    /^\d{4}$/.test(identitasUTTP.tahunPembuatan) &&
+    Number(identitasUTTP.tahunPembuatan) >= 1000 &&
+    Number(identitasUTTP.tahunPembuatan) <= currentYear;
+  const isKondisiOperasiValid =
+    isPositiveNumber(kondisiOperasi.ujiAlkMaksimum) &&
+    isPositiveNumber(kondisiOperasi.ujiAlkMinimum) &&
+    isPositiveNumber(kondisiOperasi.mfr);
+
   const isDataPengujianFilled =
     Boolean(formDataState.nomorOrder.trim()) &&
     Boolean(namaPemilik.trim()) &&
-    Boolean(formDataState.noSPBU.trim()) &&
+    isNoSPBUValid &&
     Boolean(formDataState.contactPerson.trim()) &&
     Boolean(formDataState.alamatTerpasang.trim()) &&
     Boolean(formDataState.namaPompaUkur.trim()) &&
@@ -189,13 +213,11 @@ export default function PemeriksaanAwalPage({
     Boolean(identitasUTTP.merek.trim()) &&
     Boolean(identitasUTTP.tipeModel.trim()) &&
     Boolean(identitasUTTP.nomorSeri.trim()) &&
-    Boolean(identitasUTTP.jumlahNozzle.trim()) &&
-    Boolean(identitasUTTP.tahunPembuatan.trim());
+    isJumlahNozzleValid &&
+    isTahunPembuatanValid;
 
   const isKondisiOperasiFilled =
-    Boolean(kondisiOperasi.ujiAlkMaksimum.trim()) &&
-    Boolean(kondisiOperasi.ujiAlkMinimum.trim()) &&
-    Boolean(kondisiOperasi.mfr.trim()) &&
+    isKondisiOperasiValid &&
     Boolean(kondisiOperasi.nomorPencacahTipe.trim());
 
   const allChecklistFilled = checklist.every((item) => item.penilaian !== null);
@@ -228,7 +250,7 @@ export default function PemeriksaanAwalPage({
         ...formDataState,
         namaPemilik,
         namaPetugas1,
-        noSPBU: formData?.step1?.dataPengujian?.noSPBU || "",
+        noSPBU: formDataState.noSPBU,
       },
       identitasUTTP,
       kondisiOperasi,
@@ -358,15 +380,25 @@ export default function PemeriksaanAwalPage({
               label="Nomor SPBU"
               required
               error={
-                isSubmitted && !formDataState.noSPBU.trim()
-                  ? "Nomor SPBU wajib diisi."
+                isSubmitted
+                  ? !formDataState.noSPBU.trim()
+                    ? "Nomor SPBU wajib diisi."
+                    : !isNoSPBUValid
+                      ? "Nomor SPBU hanya boleh berisi angka."
+                      : undefined
                   : undefined
               }
             >
               <Input
+                inputMode="numeric"
+                pattern="[0-9]*"
                 placeholder="cth. 01234"
                 value={formDataState.noSPBU}
-                onChange={(e) => updateDataPengujian("noSPBU", e.target.value)}
+                onChange={(e) => {
+                  if (isDigitsOnly(e.target.value)) {
+                    updateDataPengujian("noSPBU", e.target.value);
+                  }
+                }}
               />
             </FormField>
 
@@ -546,17 +578,27 @@ export default function PemeriksaanAwalPage({
               label="Jumlah Nozzle"
               required
               error={
-                isSubmitted && !identitasUTTP.jumlahNozzle.trim()
-                  ? "Jumlah nozzle wajib diisi."
+                isSubmitted
+                  ? !identitasUTTP.jumlahNozzle.trim()
+                    ? "Jumlah nozzle wajib diisi."
+                    : !isJumlahNozzleValid
+                      ? "Jumlah nozzle harus berupa bilangan bulat lebih dari 0."
+                      : undefined
                   : undefined
               }
             >
               <Input
+                type="number"
+                min="1"
+                step="1"
+                inputMode="numeric"
                 placeholder="cth. 1"
                 value={identitasUTTP.jumlahNozzle}
-                onChange={(e) =>
-                  updateIdentitasUTTP("jumlahNozzle", e.target.value)
-                }
+                onChange={(e) => {
+                  if (isDigitsOnly(e.target.value)) {
+                    updateIdentitasUTTP("jumlahNozzle", e.target.value);
+                  }
+                }}
               />
             </FormField>
 
@@ -564,17 +606,28 @@ export default function PemeriksaanAwalPage({
               label="Tahun Pembuatan"
               required
               error={
-                isSubmitted && !identitasUTTP.tahunPembuatan.trim()
-                  ? "Tahun pembuatan wajib diisi."
+                isSubmitted
+                  ? !identitasUTTP.tahunPembuatan.trim()
+                    ? "Tahun pembuatan wajib diisi."
+                    : !isTahunPembuatanValid
+                      ? `Tahun pembuatan harus berupa tahun 4 digit yang tidak melebihi ${currentYear}.`
+                      : undefined
                   : undefined
               }
             >
               <Input
+                type="number"
+                min="1000"
+                max={currentYear}
+                step="1"
+                inputMode="numeric"
                 placeholder="cth. 2020"
                 value={identitasUTTP.tahunPembuatan}
-                onChange={(e) =>
-                  updateIdentitasUTTP("tahunPembuatan", e.target.value)
-                }
+                onChange={(e) => {
+                  if (isDigitsOnly(e.target.value)) {
+                    updateIdentitasUTTP("tahunPembuatan", e.target.value);
+                  }
+                }}
               />
             </FormField>
           </div>
@@ -592,12 +645,19 @@ export default function PemeriksaanAwalPage({
               label="Uji Alk Maksimum (L/menit)"
               required
               error={
-                isSubmitted && !kondisiOperasi.ujiAlkMaksimum.trim()
-                  ? "Uji alk maksimum wajib diisi."
+                isSubmitted
+                  ? !kondisiOperasi.ujiAlkMaksimum.trim()
+                    ? "Uji alk maksimum wajib diisi."
+                    : !isPositiveNumber(kondisiOperasi.ujiAlkMaksimum)
+                      ? "Nilai harus berupa angka lebih dari 0."
+                      : undefined
                   : undefined
               }
             >
               <Input
+                type="number"
+                min="0"
+                step="any"
                 placeholder="cth. 1"
                 value={kondisiOperasi.ujiAlkMaksimum}
                 onChange={(e) =>
@@ -610,12 +670,19 @@ export default function PemeriksaanAwalPage({
               label="Uji Alk Minimum (L/menit)"
               required
               error={
-                isSubmitted && !kondisiOperasi.ujiAlkMinimum.trim()
-                  ? "Uji alk minimum wajib diisi."
+                isSubmitted
+                  ? !kondisiOperasi.ujiAlkMinimum.trim()
+                    ? "Uji alk minimum wajib diisi."
+                    : !isPositiveNumber(kondisiOperasi.ujiAlkMinimum)
+                      ? "Nilai harus berupa angka lebih dari 0."
+                      : undefined
                   : undefined
               }
             >
               <Input
+                type="number"
+                min="0"
+                step="any"
                 placeholder="cth. 1"
                 value={kondisiOperasi.ujiAlkMinimum}
                 onChange={(e) =>
@@ -628,12 +695,19 @@ export default function PemeriksaanAwalPage({
               label="MFR = Min Measured Quantity (L) (hasil)"
               required
               error={
-                isSubmitted && !kondisiOperasi.mfr.trim()
-                  ? "MFR wajib diisi."
+                isSubmitted
+                  ? !kondisiOperasi.mfr.trim()
+                    ? "MFR wajib diisi."
+                    : !isPositiveNumber(kondisiOperasi.mfr)
+                      ? "Nilai harus berupa angka lebih dari 0."
+                      : undefined
                   : undefined
               }
             >
               <Input
+                type="number"
+                min="0"
+                step="any"
                 placeholder="cth. 1"
                 value={kondisiOperasi.mfr}
                 onChange={(e) => updateKondisiOperasi("mfr", e.target.value)}

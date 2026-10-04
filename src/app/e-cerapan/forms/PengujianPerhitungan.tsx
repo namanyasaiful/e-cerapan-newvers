@@ -25,9 +25,58 @@ import {
 function parseNum(val: string | undefined | null): number {
   if (!val) return NaN;
   const clean = val.toString().replace(",", ".").trim();
+  if (!/^(?:\d+(?:\.\d+)?|\.\d+)$/.test(clean)) return NaN;
   const parsed = parseFloat(clean);
-  return isNaN(parsed) ? NaN : parsed;
+  return Number.isFinite(parsed) ? parsed : NaN;
 }
+
+const isDecimalInput = (value: string) => /^\d*(?:[.,]\d*)?$/.test(value);
+
+const isPositiveDecimal = (value: string) => {
+  const normalized = value.trim().replace(",", ".");
+  return (
+    /^(?:\d+(?:\.\d+)?|\.\d+)$/.test(normalized) &&
+    Number.isFinite(Number(normalized)) &&
+    Number(normalized) > 0
+  );
+};
+
+const isNonNegativeDecimal = (value: string) => {
+  const normalized = value.trim().replace(",", ".");
+  return (
+    /^(?:\d+(?:\.\d+)?|\.\d+)$/.test(normalized) &&
+    Number.isFinite(Number(normalized)) &&
+    Number(normalized) >= 0
+  );
+};
+
+const isPositiveInteger = (value: string) =>
+  /^\d+$/.test(value) &&
+  Number.isSafeInteger(Number(value)) &&
+  Number(value) > 0;
+
+const isValidDate = (value: string) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+};
+
+const getValidationError = (
+  isSubmitted: boolean,
+  value: string,
+  isValid: boolean,
+  label: string,
+  invalidMessage: string,
+) => {
+  if (!isSubmitted) return undefined;
+  if (!value.trim()) return `${label} wajib diisi.`;
+  return isValid ? undefined : invalidMessage;
+};
 
 export default function PengujianPerhitunganPage({
   formData,
@@ -115,6 +164,7 @@ export default function PengujianPerhitunganPage({
     field: "sebelumUji" | "sesudahUji",
     value: string,
   ) => {
+    if (!isDecimalInput(value)) return;
     setTotalisator((prev) => {
       const updated = { ...prev, [field]: value };
       const a = parseNum(updated.sebelumUji);
@@ -132,6 +182,7 @@ export default function PengujianPerhitunganPage({
     field: keyof CerapanItem,
     value: string,
   ) => {
+    if (!isDecimalInput(value)) return;
     setCerapan((prev) => {
       const updated = [...prev];
       const newItem = { ...updated[index], [field]: value };
@@ -272,28 +323,33 @@ export default function PengujianPerhitunganPage({
   const isDataNozzleFilled = Boolean(
     dataNozzle.identitas.trim() &&
     dataNozzle.jenisCairan.trim() &&
-    dataNozzle.hargaSatuan.trim()
+    isPositiveInteger(dataNozzle.hargaSatuan)
   );
 
   const isDataBejanaFilled = Boolean(
     dataBejana.merek.trim() &&
     dataBejana.tipe.trim() &&
     dataBejana.nomorSeri.trim() &&
-    dataBejana.volNominal.trim() &&
-    dataBejana.volSebenarnya.trim() &&
-    dataBejana.skalaUtama.trim() &&
-    dataBejana.tglVerifikasi.trim()
+    isPositiveDecimal(dataBejana.volNominal) &&
+    isPositiveDecimal(dataBejana.volSebenarnya) &&
+    isPositiveDecimal(dataBejana.skalaUtama) &&
+    isValidDate(dataBejana.tglVerifikasi)
   );
 
-  const isTotalisatorFilled = Boolean(
-    totalisator.sebelumUji.trim() && totalisator.sesudahUji.trim()
-  );
+  const isTotalisatorFilled =
+    isNonNegativeDecimal(totalisator.sebelumUji) &&
+    isNonNegativeDecimal(totalisator.sesudahUji) &&
+    parseNum(totalisator.sesudahUji) >= parseNum(totalisator.sebelumUji);
+  const isSesudahUjiValid =
+    isNonNegativeDecimal(totalisator.sesudahUji) &&
+    (!isNonNegativeDecimal(totalisator.sebelumUji) ||
+      parseNum(totalisator.sesudahUji) >= parseNum(totalisator.sebelumUji));
 
   const isCerapanFilled = cerapan.every(
     (item) =>
-      item.volNominal.trim() &&
-      item.penunjukan.trim() &&
-      item.volSebenarnya.trim()
+      isPositiveDecimal(item.volNominal) &&
+      isPositiveDecimal(item.penunjukan) &&
+      isPositiveDecimal(item.volSebenarnya),
   );
 
   const isFormValid =
@@ -315,6 +371,7 @@ export default function PengujianPerhitunganPage({
   };
 
   const handleSubmit = () => {
+    if (!isFormValid) return;
     const step2Payload: Step2Data = {
       dataNozzle,
       dataBejana,
@@ -418,7 +475,17 @@ export default function PengujianPerhitunganPage({
           contentClassName="p-5"
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
-            <FormField label="Identitas Nozzle" required>
+            <FormField
+              label="Identitas Nozzle"
+              required
+              error={getValidationError(
+                isSubmitted,
+                dataNozzle.identitas,
+                Boolean(dataNozzle.identitas.trim()),
+                "Identitas nozzle",
+                "Identitas nozzle wajib diisi.",
+              )}
+            >
               <Input
                 placeholder="cth. Nozzle 1"
                 value={dataNozzle.identitas}
@@ -427,7 +494,17 @@ export default function PengujianPerhitunganPage({
                 }
               />
             </FormField>
-            <FormField label="Jenis Cairan" required>
+            <FormField
+              label="Jenis Cairan"
+              required
+              error={getValidationError(
+                isSubmitted,
+                dataNozzle.jenisCairan,
+                Boolean(dataNozzle.jenisCairan.trim()),
+                "Jenis cairan",
+                "Jenis cairan wajib diisi.",
+              )}
+            >
               <Input
                 placeholder="cth. Pertalite (RON 90)"
                 value={dataNozzle.jenisCairan}
@@ -436,13 +513,30 @@ export default function PengujianPerhitunganPage({
                 }
               />
             </FormField>
-            <FormField label="Harga Satuan (Rp/L)" required>
+            <FormField
+              label="Harga Satuan (Rp/L)"
+              required
+              error={getValidationError(
+                isSubmitted,
+                dataNozzle.hargaSatuan,
+                isPositiveInteger(dataNozzle.hargaSatuan),
+                "Harga satuan",
+                "Harga satuan harus berupa bilangan bulat positif.",
+              )}
+            >
               <Input
+                inputMode="numeric"
+                pattern="[0-9]*"
                 placeholder="cth. 10000"
                 value={dataNozzle.hargaSatuan}
-                onChange={(e) =>
-                  setDataNozzle({ ...dataNozzle, hargaSatuan: e.target.value })
-                }
+                onChange={(e) => {
+                  if (/^\d*$/.test(e.target.value)) {
+                    setDataNozzle({
+                      ...dataNozzle,
+                      hargaSatuan: e.target.value,
+                    });
+                  }
+                }}
               />
             </FormField>
           </div>
@@ -456,7 +550,17 @@ export default function PengujianPerhitunganPage({
           contentClassName="p-5"
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
-            <FormField label="Merek" required>
+            <FormField
+              label="Merek"
+              required
+              error={getValidationError(
+                isSubmitted,
+                dataBejana.merek,
+                Boolean(dataBejana.merek.trim()),
+                "Merek",
+                "Merek wajib diisi.",
+              )}
+            >
               <Input
                 placeholder="cth. Pertamina Calibration"
                 value={dataBejana.merek}
@@ -465,7 +569,17 @@ export default function PengujianPerhitunganPage({
                 }
               />
             </FormField>
-            <FormField label="Tipe/Model" required>
+            <FormField
+              label="Tipe/Model"
+              required
+              error={getValidationError(
+                isSubmitted,
+                dataBejana.tipe,
+                Boolean(dataBejana.tipe.trim()),
+                "Tipe/model",
+                "Tipe/model wajib diisi.",
+              )}
+            >
               <Input
                 placeholder="cth. BU-20L"
                 value={dataBejana.tipe}
@@ -474,7 +588,17 @@ export default function PengujianPerhitunganPage({
                 }
               />
             </FormField>
-            <FormField label="Nomor Seri" required>
+            <FormField
+              label="Nomor Seri"
+              required
+              error={getValidationError(
+                isSubmitted,
+                dataBejana.nomorSeri,
+                Boolean(dataBejana.nomorSeri.trim()),
+                "Nomor seri",
+                "Nomor seri wajib diisi.",
+              )}
+            >
               <Input
                 placeholder="cth. BJ-2023-0012"
                 value={dataBejana.nomorSeri}
@@ -483,37 +607,92 @@ export default function PengujianPerhitunganPage({
                 }
               />
             </FormField>
-            <FormField label="Volume Nominal (L)" required>
+            <FormField
+              label="Volume Nominal (L)"
+              required
+              error={getValidationError(
+                isSubmitted,
+                dataBejana.volNominal,
+                isPositiveDecimal(dataBejana.volNominal),
+                "Volume nominal",
+                "Volume harus berupa angka lebih dari 0.",
+              )}
+            >
               <Input
+                inputMode="decimal"
                 placeholder="cth. 20"
                 value={dataBejana.volNominal}
-                onChange={(e) =>
-                  setDataBejana({ ...dataBejana, volNominal: e.target.value })
-                }
+                onChange={(e) => {
+                  if (isDecimalInput(e.target.value)) {
+                    setDataBejana({
+                      ...dataBejana,
+                      volNominal: e.target.value,
+                    });
+                  }
+                }}
               />
             </FormField>
-            <FormField label="Volume Sebenarnya (L)" required>
+            <FormField
+              label="Volume Sebenarnya (L)"
+              required
+              error={getValidationError(
+                isSubmitted,
+                dataBejana.volSebenarnya,
+                isPositiveDecimal(dataBejana.volSebenarnya),
+                "Volume sebenarnya",
+                "Volume harus berupa angka lebih dari 0.",
+              )}
+            >
               <Input
+                inputMode="decimal"
                 placeholder="cth. 19.998"
                 value={dataBejana.volSebenarnya}
-                onChange={(e) =>
-                  setDataBejana({
-                    ...dataBejana,
-                    volSebenarnya: e.target.value,
-                  })
-                }
+                onChange={(e) => {
+                  if (isDecimalInput(e.target.value)) {
+                    setDataBejana({
+                      ...dataBejana,
+                      volSebenarnya: e.target.value,
+                    });
+                  }
+                }}
               />
             </FormField>
-            <FormField label="Skala Utama Sebenarnya (L)" required>
+            <FormField
+              label="Skala Utama Sebenarnya (L)"
+              required
+              error={getValidationError(
+                isSubmitted,
+                dataBejana.skalaUtama,
+                isPositiveDecimal(dataBejana.skalaUtama),
+                "Skala utama",
+                "Skala utama harus berupa angka lebih dari 0.",
+              )}
+            >
               <Input
+                inputMode="decimal"
                 placeholder="cth. 0.05"
                 value={dataBejana.skalaUtama}
-                onChange={(e) =>
-                  setDataBejana({ ...dataBejana, skalaUtama: e.target.value })
-                }
+                onChange={(e) => {
+                  if (isDecimalInput(e.target.value)) {
+                    setDataBejana({
+                      ...dataBejana,
+                      skalaUtama: e.target.value,
+                    });
+                  }
+                }}
               />
             </FormField>
-            <FormField label="Tanggal Verifikasi Terakhir" required>
+            <FormField
+              label="Tanggal Verifikasi Terakhir"
+              required
+              error={getValidationError(
+                isSubmitted,
+                dataBejana.tglVerifikasi,
+                isValidDate(dataBejana.tglVerifikasi),
+                "Tanggal verifikasi",
+                "Tanggal verifikasi harus berupa tanggal yang valid.",
+              )}
+            >
               <Input
                 type="date"
                 value={dataBejana.tglVerifikasi}
@@ -536,8 +715,19 @@ export default function PengujianPerhitunganPage({
           contentClassName="p-5"
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
-            <FormField label="Sebelum Uji — a (L)" required>
+            <FormField
+              label="Sebelum Uji — a (L)"
+              required
+              error={getValidationError(
+                isSubmitted,
+                totalisator.sebelumUji,
+                isNonNegativeDecimal(totalisator.sebelumUji),
+                "Sebelum uji",
+                "Nilai harus berupa angka 0 atau lebih.",
+              )}
+            >
               <Input
+                inputMode="decimal"
                 placeholder="cth. 15432,000"
                 value={totalisator.sebelumUji}
                 onChange={(e) =>
@@ -545,8 +735,19 @@ export default function PengujianPerhitunganPage({
                 }
               />
             </FormField>
-            <FormField label="Sesudah Uji — b (L)" required>
+            <FormField
+              label="Sesudah Uji — b (L)"
+              required
+              error={getValidationError(
+                isSubmitted,
+                totalisator.sesudahUji,
+                isSesudahUjiValid,
+                "Sesudah uji",
+                "Nilai harus berupa angka dan tidak boleh lebih kecil dari sebelum uji.",
+              )}
+            >
               <Input
+                inputMode="decimal"
                 placeholder="cth. 15492,000"
                 value={totalisator.sesudahUji}
                 onChange={(e) =>
@@ -595,8 +796,19 @@ export default function PengujianPerhitunganPage({
                   )}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4">
-                  <FormField label="Vol. Nominal (L)" required>
+                  <FormField
+                    label="Vol. Nominal (L)"
+                    required
+                    error={getValidationError(
+                      isSubmitted,
+                      item.volNominal,
+                      isPositiveDecimal(item.volNominal),
+                      "Volume nominal",
+                      "Volume harus berupa angka lebih dari 0.",
+                    )}
+                  >
                     <Input
+                      inputMode="decimal"
                       placeholder="cth. 20"
                       value={item.volNominal}
                       onChange={(e) =>
@@ -604,8 +816,19 @@ export default function PengujianPerhitunganPage({
                       }
                     />
                   </FormField>
-                  <FormField label="Penunjukan Cerapan (L)" required>
+                  <FormField
+                    label="Penunjukan Cerapan (L)"
+                    required
+                    error={getValidationError(
+                      isSubmitted,
+                      item.penunjukan,
+                      isPositiveDecimal(item.penunjukan),
+                      "Penunjukan cerapan",
+                      "Nilai harus berupa angka lebih dari 0.",
+                    )}
+                  >
                     <Input
+                      inputMode="decimal"
                       placeholder="cth. 20,050"
                       value={item.penunjukan}
                       onChange={(e) =>
@@ -613,8 +836,19 @@ export default function PengujianPerhitunganPage({
                       }
                     />
                   </FormField>
-                  <FormField label="Vol. Sebenarnya (L)" required>
+                  <FormField
+                    label="Vol. Sebenarnya (L)"
+                    required
+                    error={getValidationError(
+                      isSubmitted,
+                      item.volSebenarnya,
+                      isPositiveDecimal(item.volSebenarnya),
+                      "Volume sebenarnya",
+                      "Volume harus berupa angka lebih dari 0.",
+                    )}
+                  >
                     <Input
+                      inputMode="decimal"
                       placeholder="cth. 19,980"
                       value={item.volSebenarnya}
                       onChange={(e) =>
@@ -715,7 +949,7 @@ export default function PengujianPerhitunganPage({
 
         {/* ═══ Feedback Warning jika belum lengkap saat submit ═══ */}
         {isSubmitted && !isFormValid && (
-          <FormWarning message="Lengkapi seluruh field wajib (*) pada Data Nozzle, Bejana, Totalisator, dan Cerapan sebelum melanjutkan." />
+          <FormWarning message="Lengkapi seluruh field wajib dengan format yang benar. Nilai volume dan totalisator harus berupa angka valid, harga satuan harus bilangan bulat positif, dan nilai sesudah uji tidak boleh lebih kecil dari sebelum uji." />
         )}
 
         {/* ═══ Action Buttons ═══ */}
