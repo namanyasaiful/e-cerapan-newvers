@@ -1,18 +1,80 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import AuthHeroBanner from "@/components/login/AuthHeroBanner";
 import ChevronButton from "@/components/ui/ChevronButton";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function ForgotPasswordPage() {
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState<string | undefined>();
+  const [touched, setTouched] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const validateEmail = (value: string): string | undefined => {
+    const trimmed = value.trim();
+    if (!trimmed) return "Email wajib diisi.";
+    if (!EMAIL_REGEX.test(trimmed)) return "Format email tidak valid.";
+    return undefined;
+  };
+
+  const handleChange = (value: string) => {
+    setEmail(value);
+    if (touched) {
+      setEmailError(validateEmail(value));
+    }
+  };
+
+  const handleBlur = () => {
+    setTouched(true);
+    setEmailError(validateEmail(email));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Logika pengiriman email reset password
+    setStatusMessage("");
+    setErrorMessage("");
+
+    const error = validateEmail(email);
+    setEmailError(error);
+    setTouched(true);
+
+    if (error) return;
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        setErrorMessage(
+          result.message ?? "Gagal mengirim email reset. Silakan coba lagi."
+        );
+        return;
+      }
+
+      setStatusMessage(
+        "Jika email terdaftar, kami telah mengirim tautan reset password."
+      );
+      setEmail("");
+      setTouched(false);
+    } catch {
+      setErrorMessage("Tidak dapat terhubung ke server. Silakan coba lagi.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -35,17 +97,57 @@ export default function ForgotPasswordPage() {
             </p>
           </div>
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={handleSubmit} noValidate>
             <div>
               <label className="block text-sm font-medium text-black mb-1.5">
                 Email
               </label>
-              <Input type="email" placeholder="Masukan Email" required />
+              <Input
+                type="email"
+                name="email"
+                value={email}
+                onChange={(e) => handleChange(e.target.value)}
+                onBlur={handleBlur}
+                placeholder="Masukan Email"
+                autoComplete="email"
+                required
+                aria-invalid={Boolean(touched && emailError)}
+                aria-describedby={
+                  touched && emailError ? "email-error" : undefined
+                }
+                className={
+                  touched && emailError
+                    ? "border-red-500 focus:border-red-500"
+                    : undefined
+                }
+              />
+              {touched && emailError && (
+                <p id="email-error" className="mt-1 text-sm text-red-600">
+                  {emailError}
+                </p>
+              )}
             </div>
 
-            <Button type="submit" variant="primary" size="md" fullWidth>
-              Kirim
+            <Button
+              type="submit"
+              variant="primary"
+              size="md"
+              fullWidth
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Mengirim..." : "Kirim"}
             </Button>
+
+            {statusMessage && (
+              <p className="text-sm text-green-600" role="status">
+                {statusMessage}
+              </p>
+            )}
+            {errorMessage && (
+              <p className="text-sm text-red-600" role="alert">
+                {errorMessage}
+              </p>
+            )}
           </form>
         </div>
       </div>

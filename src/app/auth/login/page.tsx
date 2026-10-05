@@ -16,28 +16,96 @@ interface LoginResponse {
   };
 }
 
+interface FieldErrors {
+  email?: string;
+  password?: string;
+}
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function Page() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [touched, setTouched] = useState<{ email?: boolean; password?: boolean }>(
+    {}
+  );
+
+  const validateEmail = (value: string): string | undefined => {
+    const trimmed = value.trim();
+    if (!trimmed) return "Email wajib diisi.";
+    if (!EMAIL_REGEX.test(trimmed)) return "Format email tidak valid.";
+    return undefined;
+  };
+
+  const validatePassword = (value: string): string | undefined => {
+    if (!value) return "Password wajib diisi.";
+    if (value.length < 8) return "Password minimal 8 karakter.";
+    if (!/[A-Z]/.test(value)) return "Password harus mengandung huruf kapital.";
+    if (!/[a-z]/.test(value)) return "Password harus mengandung huruf kecil.";
+    if (!/[0-9]/.test(value)) return "Password harus mengandung angka.";
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(value))
+      return "Password harus mengandung simbol.";
+    return undefined;
+  };
+
+  const validateForm = (): FieldErrors => {
+    return {
+      email: validateEmail(email),
+      password: validatePassword(password),
+    };
+  };
+
+  const handleBlur = (field: "email" | "password") => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const error =
+      field === "email" ? validateEmail(email) : validatePassword(password);
+    setFieldErrors((prev) => ({ ...prev, [field]: error }));
+  };
+
+  const handleChange = (
+    field: "email" | "password",
+    value: string
+  ) => {
+    if (field === "email") setEmail(value);
+    else setPassword(value);
+
+    if (touched[field]) {
+      const error =
+        field === "email" ? validateEmail(value) : validatePassword(value);
+      setFieldErrors((prev) => ({ ...prev, [field]: error }));
+    }
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorMessage("");
+
+    const errors = validateForm();
+    setFieldErrors(errors);
+    setTouched({ email: true, password: true });
+
+    if (errors.email || errors.password) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       });
       const result: LoginResponse = await response.json();
 
       if (!response.ok) {
-        setErrorMessage(result.message ?? "Login gagal. Periksa email dan password.");
+        setErrorMessage(
+          result.message ?? "Login gagal. Periksa email dan password."
+        );
         return;
       }
 
@@ -73,35 +141,63 @@ export default function Page() {
           </div>
 
           {/* Form Inputs */}
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-4" onSubmit={handleSubmit} noValidate>
             <div>
-              <label className="block text-sm  text-black mb-1">
-                Email
-              </label>
+              <label className="block text-sm text-black mb-1">Email</label>
               <Input
                 type="email"
                 name="email"
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={(event) => handleChange("email", event.target.value)}
+                onBlur={() => handleBlur("email")}
                 autoComplete="email"
                 required
                 placeholder="Masukan Email"
+                aria-invalid={Boolean(touched.email && fieldErrors.email)}
+                aria-describedby={
+                  touched.email && fieldErrors.email ? "email-error" : undefined
+                }
+                className={
+                  touched.email && fieldErrors.email
+                    ? "border-red-500 focus:border-red-500"
+                    : undefined
+                }
               />
+              {touched.email && fieldErrors.email && (
+                <p id="email-error" className="mt-1 text-sm text-red-600">
+                  {fieldErrors.email}
+                </p>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm text-black mb-1">
-                Password
-              </label>
+              <label className="block text-sm text-black mb-1">Password</label>
               <Input
                 type="password"
                 name="password"
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={(event) => handleChange("password", event.target.value)}
+                onBlur={() => handleBlur("password")}
                 autoComplete="current-password"
                 required
                 placeholder="Masukan Password"
+                aria-invalid={Boolean(touched.password && fieldErrors.password)}
+                aria-describedby={
+                  touched.password && fieldErrors.password
+                    ? "password-error"
+                    : undefined
+                }
+                className={
+                  touched.password && fieldErrors.password
+                    ? "border-red-500 focus:border-red-500"
+                    : undefined
+                }
               />
+              {touched.password && fieldErrors.password && (
+                <p id="password-error" className="mt-1 text-sm text-red-600">
+                  {fieldErrors.password}
+                </p>
+              )}
             </div>
 
             <div className="flex justify-end text-sm">
@@ -139,7 +235,6 @@ export default function Page() {
             </Link>
           </p>
         </div>
-
       </div>
     </main>
   );
